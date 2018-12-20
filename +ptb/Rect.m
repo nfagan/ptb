@@ -50,10 +50,10 @@ classdef Rect < ptb.RectPrimitive
     %
     %     IsInteger is a read-only logical scalar indicating whether the
     %     components of the Rect object must be integer-valued. If true,
-    %     attempting to assign a floating point value to X1, X2, Y1, or Y2
-    %     will throw an error. The only exception is that NaN values are
-    %     permitted and treated as integer-valued, unless IsNonNan is also
-    %     true.
+    %     attempting to assign a non-integer value to X1, X2, Y1, or Y2
+    %     will throw an error. NaN values are permitted and treated as 
+    %     integer-valued. To additionally restrict values to be non-nan, 
+    %     see the IsNonNan property.
     %
     %     See also ptb.Rect, ptb.Rect.Configured, ptb.Rect.IsNonNan
     IsInteger = false;
@@ -77,7 +77,7 @@ classdef Rect < ptb.RectPrimitive
   end
   
   methods
-    function obj = Rect(r)
+    function obj = Rect(r, varargin)
       
       %   RECT -- Create Rect.
       %
@@ -90,6 +90,9 @@ classdef Rect < ptb.RectPrimitive
       %     use with Screen() functions; use the `set` method to set the
       %     contents from a standard vector.
       %
+      %     r = ptb.Rect( rect_vector ); creates a ptb.Rect objects whose
+      %     components are set from the 4-element `rect_vector`.
+      %
       %     By default, components can be negative, floating point, and /
       %     or NaN. To restrict component attributes -- e.g., to disallow
       %     NaN or negative components -- see the ptb.Rect.Configured 
@@ -99,9 +102,15 @@ classdef Rect < ptb.RectPrimitive
       %       ptb.Rect.Configured, ptb.Rect.IsNonNegative, 
       %       ptb.Rect.NonNegative
       
-      if ( nargin > 0 )
+      if ( nargin == 1 && ~isempty(r) )
         try
           obj = set( obj, r );
+        catch err
+          throw( err );
+        end
+      elseif ( nargin > 1 )
+        try
+          obj = ptb.Rect.Configured( 'Rect', r, varargin{:} );
         catch err
           throw( err );
         end
@@ -142,6 +151,15 @@ classdef Rect < ptb.RectPrimitive
   end
   
   methods (Access = public)
+    
+    function obj = empty(obj)
+      
+      %   EMPTY -- Make object empty.
+      %
+      %     B = empty( A ); 
+      
+      obj(1:numel(obj)) = [];
+    end
     
     function tf = eq(obj, B)
       
@@ -211,24 +229,26 @@ classdef Rect < ptb.RectPrimitive
       if ( ~isa(obj, cls) || ~isa(r, cls) )
         reason = 'Classes of A and B do not match.';
         return
-      end 
+      end
+      
+      other = get( r );
       
       if ( obj.IsNonNegative ~= r.IsNonNegative )
-        if ( obj.IsNonNegative && any(get(r) < 0) )
+        if ( obj.IsNonNegative && any(other < 0) )
           reason = 'Rect A is non-negative, but Rect B has negative elements.';
           return
         end
       end
       
       if ( obj.IsInteger ~= r.IsInteger )
-        if ( obj.IsInteger && ~ptb.Rect.all_is_integer(get(r)) )
+        if ( obj.IsInteger && ~ptb.Rect.all_is_integer(other) )
           reason = 'Rect A is integer-valued, but Rect B has non-integer elements.';
           return
         end
       end
       
       if ( obj.IsNonNan ~= r.IsNonNan )
-        if ( obj.IsNonNan && any(isnan(get(r))) )
+        if ( obj.IsNonNan && any(isnan(other)) )
           reason = 'Rect A is non-NaN, but Rect B has NaN elements.';
           return
         end
@@ -547,7 +567,7 @@ classdef Rect < ptb.RectPrimitive
       end
       
       if ( results.Empty )
-        rect(1) = [];
+        rect = empty( rect );
       end
     end
     

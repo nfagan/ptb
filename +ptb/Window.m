@@ -20,11 +20,19 @@ classdef Window < handle
     %     
     %     See also ptb.Rect, ptb.Window, ptb.Window.Width, 
     %       ptb.Window.Height, ptb.Window.set_width, ptb.Window.set_height
-    Rect = ptb.Rect.Configured( ...
-          'IsNonNan',       true ...
+    Rect = ptb.Rect( [] ...
+        , 'IsNonNan',       true ...
         , 'IsNonNegative',  true ...
         , 'Empty',          true ...
     );
+  
+    %   PHYSICALDIMENSIONS -- Physical size of the Window.
+    %
+    %     PhysicalDimensions is a 2-element vector giving the width and
+    %     height of the Window in physical units such as cm.
+    %
+    %     See also ptb.Window, ptb.Window.Rect
+    PhysicalDimensions = nan( 1, 2 );
     
     %   BACKGROUNDCOLOR -- Background color of the Window.
     %
@@ -34,6 +42,13 @@ classdef Window < handle
     %
     %     See also ptb.Window, ptb.Window.Rect
     BackgroundColor = zeros( 1, 3 );
+    
+    %   SKIPSYNCTESTS -- Indicate whether to skip synchronization tests.
+    %
+    %     SkipSyncTests is a logical scalar indicating whether to skip
+    %     synchronization tests when the Window is opened.
+    
+    SkipSyncTests = false;
   end
   
   properties (GetAccess = public, SetAccess = private)
@@ -84,7 +99,7 @@ classdef Window < handle
   end
   
   methods
-    function obj = Window(varargin)
+    function obj = Window(rect)
       
       %   WINDOW -- Create Window object instance.
       %
@@ -108,6 +123,9 @@ classdef Window < handle
       %       ptb.Window.BackgroundColor, ptb.Window.IsOpen,
       %       ptb.Window.open
       
+      if ( nargin == 1 )
+        obj.Rect = rect;
+      end
     end
     
     function set.Index(obj, index)
@@ -132,6 +150,27 @@ classdef Window < handle
       end
       
       obj.Index = double( index );
+    end
+    
+    function set.SkipSyncTests(obj, tf)
+      validateattributes( tf, {'logical'}, {'scalar'}, mfilename, 'SkipSyncTests' );
+      obj.SkipSyncTests = tf;      
+    end
+    
+    function set.PhysicalDimensions(obj, dims)
+      prop = 'PhysicalDimensions';
+      
+      classes = { 'numeric' };
+      attrs = { 'numel', 2, 'nonnegative' };
+      
+      try
+        set_error_if_open( obj, prop );
+        validateattributes( dims, classes, attrs, mfilename, prop );
+      catch err
+        throw( err );
+      end
+      
+      obj.PhysicalDimensions = double( dims(:)' );
     end
     
     function set.Rect(obj, rect)
@@ -348,9 +387,13 @@ classdef Window < handle
       
       rect = get( obj.Rect );
       
+      conditional_set_skip_sync_test();
+      
       try
         [handle, rect] = Screen( 'OpenWindow', obj.Index, obj.BackgroundColor, rect );
       catch err
+        conditional_unset_skip_sync_test();
+        
         throw( err );        
       end
       
@@ -358,6 +401,20 @@ classdef Window < handle
       obj.Rect = rect;
       
       obj.IsOpen = true;
+      
+      conditional_unset_skip_sync_test( obj.SkipSyncTests );
+      
+      function conditional_set_skip_sync_test()
+        if ( obj.SkipSyncTests )
+          Screen( 'Preference', 'SkipSyncTests', 1 );
+        end
+      end
+      
+      function conditional_unset_skip_sync_test(value)
+        if ( obj.SkipSyncTests )
+          Screen( 'Preference', 'SkipSyncTests', 0 );
+        end
+      end
     end
     
     function close(obj)
@@ -381,7 +438,10 @@ classdef Window < handle
       try
         Screen( 'Close', obj.WindowHandle );
       catch err
-        warning( err.message );
+        warning( ['An error occurred when attempting to close the window.' ...
+          , ' This is most likely because the underlying window handle was' ...
+          , ' invalidated, e.g. after a call to `sca`. The message is: \n %s'] ...
+          , err.message );
       end
       
       obj.IsOpen = false;
@@ -400,8 +460,8 @@ classdef Window < handle
     end
     
     function dflt = get_default_rect(obj)
-      dflt = ptb.Rect.Configured( ...
-          'IsNonNan',       true ...
+      dflt = ptb.Rect( [] ...
+        , 'IsNonNan',       true ...
         , 'IsNonNegative',  true ...
       );
     end
