@@ -95,6 +95,16 @@ classdef MouseSource < ptb.XYSource
   
   methods (Access = private, Static = true)
     function window_handle = validate_window_handle(window_handle)
+      
+      if ( isa(window_handle, 'ptb.Window') )
+        if ( ~is_window_handle_valid(window_handle) )
+          error( 'The underlying window handle is invalid.' );
+        else
+          window_handle = window_handle.WindowHandle;
+          return
+        end
+      end
+      
       validateattributes( window_handle, {'numeric'}, {'scalar', 'integer'} ...
           , mfilename, 'window_handle' );
       

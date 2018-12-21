@@ -62,9 +62,20 @@ classdef Rect < ptb.XYBounds
   methods
     function obj = Rect(base_rect)
       
-      %   Rect -- Use bounds that are rect.
+      %   Rect -- Create bounds that are rect.
       %
-      %     See also ptb.bounds.Rect.Padding
+      %     obj = ptb.bounds.Rect() creates an object that tests whether an
+      %     (X, Y) coordinate is in bounds of a 4-element bounding rect.
+      %     All 4-components are initially NaN, meaning that the `test`
+      %     method will, by default, always return false.
+      %
+      %     obj = ptb.bounds.Rect( base_rect ); sets the underlying bounds 
+      %     to the ptb.RectPrimitive object given by `base_rect`. In the
+      %     simplest case, it is a ptb.Rect object defining minimum x,
+      %     minimum y, maximum x, and maximum y components.
+      %
+      %     See also ptb.bounds.Rect.BaseRect, ptb.Rect,
+      %       ptb.bounds.Rect.test
       
       obj = obj@ptb.XYBounds();
       obj.Padding = zeros( 1, 4 );
@@ -117,6 +128,35 @@ classdef Rect < ptb.XYBounds
   end
   
   methods (Access = public)
+    
+    function draw(obj, window, color)
+      
+      %   DRAW -- Draw outline of rect bounds.
+      %
+      %     draw( obj, window ); draws an outline of the bounding rect in
+      %     `obj` into `window`, a ptb.Window object.
+      %
+      %     draw( obj, window, color ); uses `color` to style the outline.
+      %     `color` is a 3- or 4-element vector.
+      %
+      %     See also ptb.bounds.Rect, ptb.bounds.XYBounds
+      
+      if ( ~ptb.Window.is_valid_window(window) )
+        return
+      end
+      
+      if ( nargin < 3 || isempty(color) )
+        color = [ 255, 255, 255 ];
+      end
+      
+      rect = get_bounding_rect( obj );
+      
+      try
+        Screen( 'FrameRect', window.WindowHandle, color, rect );
+      catch err
+        warning( err.message );
+      end
+    end
     
     function bounds = get_bounding_rect(obj)
       

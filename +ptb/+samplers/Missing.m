@@ -105,7 +105,7 @@ classdef Missing < ptb.XYSampler
       x = nan;
       y = nan;
       
-      has_source = ~isempty( obj.Source );
+      has_source = ~ptb.isnull( obj.Source );
       
       if ( has_source )
         is_valid_sample = obj.Source.IsValidSample;

@@ -26,7 +26,7 @@ classdef Pass < ptb.XYSampler
       y = nan;
       is_valid_sample = false;
       
-      if ( ~isempty(obj.Source) && obj.Source.IsValidSample )
+      if ( ~ptb.isnull(obj.Source) && obj.Source.IsValidSample )
         x = obj.Source.X;
         y = obj.Source.Y;
         is_valid_sample = true;

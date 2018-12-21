@@ -10,7 +10,6 @@ classdef Image
     %     valid texture handle is present.
     %
     %     See also ptb.Image
-    
     TextureHandle = nan;
   end
   

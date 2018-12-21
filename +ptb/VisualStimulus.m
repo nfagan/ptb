@@ -1,16 +1,12 @@
 classdef VisualStimulus < handle
   
   properties (Access = public)
-    %   WINDOW -- Window in which to draw stimulus.
+    %   WINDOW -- Default Window in which to draw stimulus.
     %
-    %     Window is either a handle to the ptb.Window object in which to
-    %     draw the stimulus, or the empty matrix ([]).
-    %
-    %     If Window is empty, or if the ptb.Window is not open, drawing the
-    %     stimulus will have no effect.
-    %
-    %     See also ptb.VisualStimulus, ptb.VisualStimulus.Position
-    Window = [];
+    %     Window is a handle to a ptb.Window object giving the window in
+    %     which to draw the stimulus. Window can also be a ptb.Null object,
+    %     indicating the absence of a window.
+    Window = ptb.Null;
     
     %   POSITION -- (X, Y) position of the stimulus.
     %
@@ -68,13 +64,12 @@ classdef VisualStimulus < handle
       %     See also ptb.VisualStimulus.Window,
       %       ptb.VisualStimulus.Position, ptb.stimuli.Rect
       
-      if ( nargin < 1 )
-        win = [];
+      if ( nargin == 1 )
+        obj.Window = win;
       end
       
       obj.Position = ptb.Transform();
       obj.Scale = ptb.Transform();
-      obj.Window = win;
     end
     
     function set.Position(obj, v)
@@ -88,7 +83,10 @@ classdef VisualStimulus < handle
     function set.FaceColor(obj, color)
       if ( isa(color, 'ptb.Image') )
         obj.FaceColor = color;
+      elseif ( isa(obj.FaceColor, 'ptb.Color') )
+        obj.FaceColor = check_color( obj, color, obj.FaceColor );
       else
+        obj.FaceColor = ptb.Color();
         obj.FaceColor = check_color( obj, color, obj.FaceColor );
       end
     end
@@ -98,31 +96,52 @@ classdef VisualStimulus < handle
     end
     
     function set.Window(obj, w)
-      if ( isempty(w) )
-        w = [];
-      else
-        validateattributes( w, {'ptb.Window'}, {'scalar'}, mfilename, 'Window' );
-      end
+      validateattributes( w, {'ptb.Window', 'ptb.Null'}, {'scalar'} ...
+        , mfilename, 'Window' );
+      obj.Window = w;      
+    end
+  end
+  
+  methods (Access = public)
+    
+    function b = clone(obj, constructor)
       
-      obj.Window = w;
+      %   CLONE -- Duplicate object.
+      %
+      %     See also ptb.VisualStimulus
+      
+      b = constructor( obj.Window );
+      b.Position = obj.Position;
+      b.Scale = obj.Scale;
+      b.FaceColor = obj.FaceColor;
+      b.EdgeColor = obj.EdgeColor;
     end
   end
   
   methods (Abstract = true)
-    draw(obj);
+    
+    %   DRAW -- Draw stimulus.
+    %
+    %     draw( obj ); draws `obj` into its Window.
+    %
+    %     draw( obj, window ); draws `obj` into `window`. `window` is a
+    %     valid, open ptb.Window object.
+    %
+    %     If `window` is not a ptb.Window object, or is invalid, this
+    %     function has no effect, and no error is raised.
+    %
+    %     See also ptb.VisualStimulus
+    %
+    %     IN:
+    %       - `window` (ptb.Window) |OPTIONAL|
+    draw(obj, window);
   end
   
-  methods (Access = protected)
-    function [win, is_valid] = get_window(obj)
-      win = obj.Window;
-      is_valid = ~isempty( win ) && win.IsOpen && ~isnan( win.WindowHandle );
-    end
-    
+  methods (Access = protected)    
     function color = check_color(obj, color, prop)
-      if ( ~isa(color, 'ptb.Color') && ~isa(color, 'ptb.Null') )
+      if ( ~isa(color, 'ptb.Color') && ~ptb.isnull(color) )
         color = set( prop, color );
       end
     end
-  end
-  
+  end 
 end

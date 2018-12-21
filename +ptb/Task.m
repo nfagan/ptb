@@ -4,6 +4,18 @@ classdef Task < ptb.State
     is_new_state = false;
   end
   
+  properties (Access = public)
+    
+    %   DESTRUCT -- Function to call when Task is being deleted.
+    %
+    %     Destruct is a handle to a function that accepts one input -- the
+    %     ptb.Task instance -- and returns no outputs, and which is called 
+    %     when the ptb.Task object is being deleted.
+    %
+    %     See also ptb.Task
+    Destruct = @(varargin) 1;
+  end
+  
   methods
     function obj = Task()
       
@@ -18,6 +30,19 @@ classdef Task < ptb.State
       
       % Exit if the current state is an empty array ([]).
       add_exit_condition_empty_state( obj );
+    end
+    
+    function set.Destruct(obj, v)
+      validateattributes( v, {'function_handle'}, {'scalar'}, mfilename, 'Destruct' );
+      obj.Destruct = v;      
+    end
+    
+    function delete(obj)
+      try
+        obj.Destruct( obj );
+      catch err
+        warning( err.message );
+      end
     end
   end
   

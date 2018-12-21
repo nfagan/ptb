@@ -8,7 +8,7 @@ classdef XYSampler < handle
     %     the object from which (X, Y) coordinates are drawn.
     %
     %     See also ptb.XYSampler, ptb.XYSource
-    Source;  
+    Source = ptb.Null();
   end
   
   properties (GetAccess = public, SetAccess = protected)
@@ -55,7 +55,7 @@ classdef XYSampler < handle
       %       ptb.samplers.Pass
       
       if ( nargin < 1 )
-        source = [];
+        source = ptb.Null();
       end
       
       obj.Source = source;
@@ -81,11 +81,8 @@ classdef XYSampler < handle
     end
     
     function source = validate_source(obj, source)
-      if ( isempty(source) )
-        source = [];
-      else
-        validateattributes( source, {'ptb.XYSource'}, {'scalar'}, mfilename, 'Source' );
-      end
+      validateattributes( source, {'ptb.XYSource', 'ptb.Null'} ...
+        , {'scalar'}, mfilename, 'Source' );
     end
   end
   

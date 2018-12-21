@@ -329,6 +329,38 @@ classdef Rect < ptb.RectPrimitive
       end
     end
     
+    function x = get_x_extent(obj)
+      
+      %   GET_X_EXTENT -- Get difference between maximum and minimum X.
+      %
+      %     x = get_x_extent( obj ) is obj.X2 - obj.X1.
+      %
+      %     See also ptb.Rect, ptb.Rect.set_x_extent
+      
+      x = obj.X2 - obj.X1;
+    end
+    
+    function y = get_y_extent(obj)
+      
+      %   GET_Y_EXTENT -- Get difference between maximum and minimum Y.
+      %
+      %     y = get_y_extent( obj ) is obj.Y2 - obj.Y1.
+      %
+      %     See also ptb.Rect, ptb.Rect.set_y_extent
+      
+      y = obj.Y2 - obj.Y1;
+    end
+    
+    function [x, y] = get_extents(obj)
+      
+      %   GET_EXTENTS -- Get X and Y extents, at once.
+      %
+      %     See also ptb.Rect, ptb.Rect.get_x_extent, ptb.Rect.set_extents
+      
+      x = get_x_extent( obj );
+      y = get_y_extent( obj );
+    end
+    
     function obj = set(obj, rect)
       
       %   SET -- Set Rect contents.

@@ -1,7 +1,7 @@
 classdef Transform
   
   properties (Access = public)
-    %   VALUE -- Underlying vector value.
+    %   VALUE -- Raw underlying vector value.
     %
     %     Value is an 1xN vector of raw components, which may be scaled
     %     depending on the value of Units. N is given by the NDimensions
@@ -20,11 +20,11 @@ classdef Transform
     %       - 'px': Pixels. The components of Value are taken to be in
     %         pixels, and will be unscaled.
     %       - 'cm': cm. The components of Value are taken to be in cm, and
-    %         will be scaled to the physical dimensions of the window.
+    %         will be scaled to the physical width of the window.
     %       - 'normalized': Normalized. The components of Value are taken
     %         to be fractional with respect to the width and height of the
     %         window, in pixels. E.g., a Value of [0.5, 0.5] corresponds to
-    %         half the width and half the height of the window.
+    %         half the pixel-width and half the pixel-height of the window.
     %
     %     See also ptb.Transform, ptb.Transform.get_pixel_value.
     Units = 'px';
@@ -42,19 +42,35 @@ classdef Transform
     %
     %     See also ptb.Transform, ptb.Transform.Value
     NDimensions = 2;
+    
+    %   ISNONNEGATIVE -- True if components must be non-negative.
+    %
+    %     IsNonNegative is a read-only logical scalar indicating whether
+    %     the components of the Transform must be non-negative. If true,
+    %     attempting to set a component to a negative value will produce an
+    %     error.
+    %
+    %     See also ptb.Transform, ptb.Transform.Configured
+    IsNonNegative = false;
   end
   
   methods
-    function obj = Transform(value, units)
+    function obj = Transform(value, units, n_dimensions)
       
       %   TRANSFORM -- Create Transform object.
       %
       %     obj = ptb.Transform() creates a Transform object -- an object
-      %     that represents a physical aspect of a visual stimulus, such as
-      %     its position or size, with selectable units.
+      %     that represents a vector quantity with selectable units.
+      %
+      %     Units are intended to be referenced to an on-screen
+      %     window.
       %
       %     See also ptb.Transform.Value, ptb.Transform.Units,
       %       ptb.Transform.get_pixel_value, ptb.Transform.set
+      
+      if ( nargin == 3 )
+        obj.NDimensions = n_dimensions;
+      end
       
       obj.Value = zeros( 1, obj.NDimensions );
       
@@ -74,6 +90,12 @@ classdef Transform
     function obj = set.Value(obj, value)
       obj.Value = check_value( obj, value );
     end
+    
+    function obj = set.NDimensions(obj, value)
+      validateattributes( value, {'numeric'}, {'scalar', 'positive'} ...
+        , mfilename, 'NDimensions' );      
+      obj.NDimensions = double( value );
+    end
   end
   
   methods (Access = public)    
@@ -89,11 +111,15 @@ classdef Transform
       %
       %     See also ptb.Transform, ptb.Transform.get_pixel_value
       
-      if ( isa(B, 'ptb.Transform') )
-        obj.Value = B.Value;
-        obj.Units = B.Units;
-      else
-        obj.Value = B;
+      try
+        if ( isa(B, 'ptb.Transform') )
+          obj.Value = B.Value;
+          obj.Units = B.Units;
+        else
+          obj.Value = B;
+        end
+      catch err
+        throw( err );
       end
     end
     
@@ -113,18 +139,21 @@ classdef Transform
       %   GET_PIXEL_VALUE -- Get value in pixels, accounting for Units.
       %
       %     p = get_pixel_value( obj, window ); returns the value of the
-      %     object in pixels, taking into account the Units of `obj`, using
-      %     the ptb.Window object `window`.
+      %     object in pixels, taking into account the Units of `obj`, as
+      %     referenced to the ptb.Window object `window`.
       %
       %     If Units is 'px', then p is the same as obj.Value.
       %
       %     If Units is 'normalized', then p is the value of obj.Value
-      %     normalized to the width and height of `window`. If `window`
-      %     is empty, then the components of `p` are NaN.
+      %     normalized to the pixel width and height of `window`. If 
+      %     `window` is Null, then the components of `p` are NaN. If `obj`
+      %     is one-dimensional, the component is normalized to the width of
+      %     `window`. If `obj` has more than two dimensions, the
+      %     remaining dimensions are normalized to the width of `window`.
       %
       %     If Units is 'cm', then p is the pixel value of obj.Value, using
-      %     the physical dimensions of `window` for reference. If `window`
-      %     is empty, or the physical dimensions of `window` are unset, 
+      %     the physical width of `window` for reference. If `window`
+      %     is Null, or the physical width of `window` is unset, 
       %     then the components of `p` are NaN.
       %
       %     See also ptb.Transform, ptb.Transform.Value,
@@ -138,14 +167,11 @@ classdef Transform
         return
       end
       
-      if ( isempty(window) )
+      if ( isempty(window) || ptb.isnull(window) )
         % Other units depend on the dimensions of the Window, so if the
         % window is unspecified, return early.
         out = nan( 1, obj.NDimensions );
         return
-      else
-        validateattributes( window, {'ptb.Window'}, {'scalar'} ...
-          , mfilename, 'window' );
       end
       
       w = window.Width;
@@ -162,11 +188,14 @@ classdef Transform
           out = value;
           
           out(1) = w * value(1);
-          out(2) = h * value(2);
+          
+          if ( obj.NDimensions > 1 )
+            out(2) = h * value(2);
+          end
           
           if ( obj.NDimensions > 2 )
-            % Normalization doesn't make sense in the 3-rd dimension.
-            out(3) = value(3);
+            % Normalize remaining dimensions to width.
+            out(3:end) = w * out(3:end);
           end
         otherwise
           error( 'Unrecognized units "%s".', obj.Units );
@@ -182,9 +211,66 @@ classdef Transform
         value = repmat( value, 1, N );
       end
       
-      validateattributes( value, {'numeric'}, {'numel', N}, mfilename, 'Value' );
+      attrs = { 'numel', N };
+      
+      if ( obj.IsNonNegative )
+        attrs{end+1} = 'nonnegative';
+      end
+      
+      validateattributes( value, {'numeric'}, attrs, mfilename, 'Value' );
       
       v = double( value(:)' );
+    end
+  end
+  
+  methods (Access = public, Static = true)
+    function t = Configured(varargin)
+      
+      %   CONFIGURED -- Create ptb.Transform configured with read-only
+      %     property values.
+      %
+      %     t = ptb.Transform.Configured( 'name1', value1, ... ) creates a
+      %     ptb.Transform object `t` whose property values are set in
+      %     'name', value pairs. This is the only way to set certain
+      %     properties such as IsNonNegative, which cannot be changed after 
+      %     `t` is created.
+      %
+      %     See also ptb.Transform, ptb.Transform.IsNonNegative
+      
+      p = inputParser();
+      
+      logical_scalar_validator = ....
+        @(x, kind) validateattributes( x, {'logical'}, {'scalar'}, mfilename, kind );
+      
+      addParameter( p, 'IsNonNegative', false, @(x) logical_scalar_validator(x, 'IsNonNegative') );
+      addParameter( p, 'NDimensions', 2 );
+      addParameter( p, 'Units', 'px' );
+      addParameter( p, 'Value', [] );
+      
+      parse( p, varargin{:} );
+      
+      results = p.Results;
+      
+      t = ptb.Transform( nan, results.Units, results.NDimensions );
+      
+      t.IsNonNegative = results.IsNonNegative;
+      
+      if ( ~isempty(results.Value) )
+        t = set( t, results.Value );
+      end
+    end    
+    
+    function t = OneDimensional(value, units)
+      
+      if ( nargin < 1 )
+        value = 0;
+      end
+      
+      if ( nargin < 2 )
+        units = 'px';
+      end
+      
+      t = ptb.Transform( value, units, 1 );
     end
   end
 end

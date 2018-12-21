@@ -499,4 +499,15 @@ classdef Window < handle
     end
   end
   
+  methods (Access = public, Static = true)
+    function tf = is_valid_window(win)
+      
+      %   IS_VALID_WINDOW -- True if input is an open ptb.Window object.
+      %
+      %     See also ptb.VisualStimulus
+      
+      tf = isa( win, 'ptb.Window' ) && ...
+        win.IsOpen && ~isnan( win.WindowHandle );
+    end
+  end
 end

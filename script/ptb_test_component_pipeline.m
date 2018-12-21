@@ -18,6 +18,11 @@ updater = ptb.ComponentUpdater();
 
 add_components( updater, source, sampler, target );
 
+for i = 1:20
+  targ = ptb.XYTarget( sampler, bounds );
+  add_component( updater, targ );
+end
+
 stp = 0;
 N = 1e4;
 ts = nan( N, 1 );

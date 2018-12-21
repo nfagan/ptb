@@ -5,13 +5,13 @@ classdef MatchRectangle < ptb.RectPrimitive
     %
     %     Rectangle is a handle to a (non-ptb-prefixed) Rectangle object
     %     from which the base rect will be drawn, or else a
-    %     ptb.stimuli.Rectangle object.
+    %     ptb.stimuli.Rect object.
     %
     %     Rectangle can also be set to the empty matrix ([]), in which case
     %     the base rect is a vector of NaN.
     %
     %     See also ptb.rects.MatchRectangle, ptb.XYBounds
-    Rectangle;
+    Rectangle = ptb.Null;
   end
   
   methods
@@ -21,13 +21,12 @@ classdef MatchRectangle < ptb.RectPrimitive
       %
       %     obj = ptb.rects.MatchRectangle( r ); constructs an object
       %     whose get() method returns the bounding rect of `r`, a
-      %     Rectangle or ptb.stimuli.Rectangle object.
+      %     Rectangle or ptb.stimuli.Rect object.
       %
-      %     See also ptb.stimuli.Rectangle, Rectangle, 
-      %       ptb.rects.MatchRectangle.get
+      %     See also ptb.stimuli.Rect, Rectangle, ptb.rects.MatchRectangle.get
       
       if ( nargin < 1 )
-        r = [];
+        r = ptb.Null();
       end
       
       obj = obj@ptb.RectPrimitive();
@@ -36,13 +35,9 @@ classdef MatchRectangle < ptb.RectPrimitive
     end
     
     function obj = set.Rectangle(obj, v)
-      if ( isempty(v) )
-        obj.Rectangle = [];
-      else
-        validateattributes( v, {'Rectangle', 'ptb.stimuli.Rect'} ...
-          , {'scalar'}, mfilename, 'Rectangle' );
-        obj.Rectangle = v;
-      end
+      validateattributes( v, {'Rectangle', 'ptb.stimuli.Rect', 'ptb.Null'} ...
+        , {'scalar'}, mfilename, 'Rectangle' );
+      obj.Rectangle = v;
     end
   end
   
@@ -56,10 +51,10 @@ classdef MatchRectangle < ptb.RectPrimitive
       %     non-empty. Otherwise, the bounding rect is a 4-element vector
       %     of NaN.
       %
-      %     See also ptb.rects.MatchRectangle, ptb.stimuli.Rectangle, 
+      %     See also ptb.rects.MatchRectangle, ptb.stimuli.Rect, 
       %       Rectangle
       
-      if ( isempty(obj.Rectangle) )
+      if ( ptb.isnull(obj.Rectangle) )
         r = nan( 1, 4 );
       elseif ( isa(obj.Rectangle, 'Rectangle') )
         r = obj.Rectangle.vertices;

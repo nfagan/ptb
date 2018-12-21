@@ -44,14 +44,16 @@ classdef Rect < ptb.VisualStimulus
   end
   
   methods (Access = public)
-    function draw(obj)
-      [window, is_valid_window] = get_window( obj );
+    function draw(obj, window)
+      if ( nargin < 2 )
+        window = obj.Window;
+      end
       
-      if ( ~is_valid_window )
+      if ( ~ptb.Window.is_valid_window(window) )
         return
       end
       
-      rect = get_rect( obj );
+      rect = get_rect( obj, window );
       
       face_color = obj.FaceColor;
       edge_color = obj.EdgeColor;
@@ -77,9 +79,13 @@ classdef Rect < ptb.VisualStimulus
       end
     end
     
-    function r = get_rect(obj)
-      scale = get_pixel_value( obj.Scale, obj.Window );
-      position = get_pixel_value( obj.Position, obj.Window );
+    function r = get_rect(obj, window)
+      if ( nargin < 2 )
+        window = obj.Window;
+      end
+      
+      scale = get_pixel_value( obj.Scale, window );
+      position = get_pixel_value( obj.Position, window );
       
       w2 = scale(1) / 2;
       h2 = scale(2) / 2;
@@ -90,6 +96,14 @@ classdef Rect < ptb.VisualStimulus
       y2 = position(2) + h2;
       
       r = [ x1, y1, x2, y2 ];
+    end
+  end
+  
+  methods (Access = public)
+    
+    function b = clone(obj)
+      b = clone@ptb.VisualStimulus( obj, @ptb.stimuli.Rect );
+      b.Shape = obj.Shape;
     end
   end
   
