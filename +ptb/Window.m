@@ -358,11 +358,11 @@ classdef Window < handle
       %
       %     See also ptb.Window, ptb.Window.open, Screen
       
-      if ( ~obj.IsOpen )
-        error( 'Window is not open.' );
-      end
-      
       time_stamp = nan;
+      
+      if ( ~obj.IsOpen )
+        return
+      end
       
       try
         time_stamp = Screen( 'Flip', obj.WindowHandle );

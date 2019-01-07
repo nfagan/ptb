@@ -201,9 +201,83 @@ classdef Transform
           error( 'Unrecognized units "%s".', obj.Units );
       end
     end
+    
+    function out = get_normalized_value(obj, window)
+      
+      %   GET_NORMALIZED_VALUE -- Get value in normalized units, 
+      %     accounting for current Units.
+      %
+      %     p = get_normalized_value( obj, window ); returns the value of 
+      %     the object as normalized to the pixel width and height of
+      %     `window`.
+      %
+      %     If Units is 'normalized', then p is the same as obj.Value.
+      %
+      %     If Units is 'px', then p is the value of obj.Value
+      %     normalized to the pixel width and height of `window`. If 
+      %     `window` is Null, then the components of `p` are NaN. If `obj`
+      %     is one-dimensional, the component is normalized to the width of
+      %     `window`. If `obj` has more than two dimensions, the
+      %     remaining dimensions are normalized to the width of `window`.
+      %
+      %     If Units is 'cm', then p is the normalized value of obj.Value, 
+      %     using the physical width of `window` for reference. If `window`
+      %     is Null, or the physical width of `window` is unset, 
+      %     then the components of `p` are NaN.
+      %
+      %     See also ptb.Transform, ptb.Transform.Value,
+      %       ptb.Transform.Units
+      
+      value = obj.Value;
+      
+      if ( strcmp(obj.Units, 'normalized') )
+        % Already normalized.
+        out = value;
+        return
+      end
+      
+      if ( isempty(window) || ptb.isnull(window) )
+        out = nan( 1, obj.NDimensions );
+        return
+      end
+      
+      w = window.Width;
+      h = window.Height;
+      
+      switch ( obj.Units )
+        case 'cm'
+          physical_dimensions = window.PhysicalDimensions;
+          ratio_px_cm = w ./ physical_dimensions(1);
+          
+          value = value * ratio_px_cm;
+          
+          out = get_normalized_value_from_px( obj, value, w, h );
+        case 'px'
+          out = get_normalized_value_from_px( obj, value, w, h );
+          
+        otherwise
+          error( 'Unrecognized units "%s".', obj.Units );
+      end      
+    end
   end
   
   methods (Access = private)
+    function p = get_normalized_value_from_px(obj, value, w, h)
+      
+      p = value;
+
+      p(1) = p(1) / w;
+
+      if ( obj.NDimensions > 1 )
+        p(2) = p(2) / h;
+      end
+
+      if ( obj.NDimensions > 2 )
+        %   Normalize remaining dimensions to width.
+        p(3:end) = p(3:end) / w;
+      end
+    end
+    
     function v = check_value(obj, value)
       N = obj.NDimensions;
       

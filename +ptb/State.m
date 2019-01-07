@@ -101,6 +101,14 @@ classdef State < handle
     %
     %     See also ptb.State.Name, ptb.State.LogEntry
     LogExit = false;
+    
+    %   USERDATA -- Store data alongside state instance.
+    %
+    %     UserData provides a means to store any matlab data-type alongside
+    %     the state instance.
+    %
+    %     See also ptb.State
+    UserData = [];
   end
   
   properties (Access = private)

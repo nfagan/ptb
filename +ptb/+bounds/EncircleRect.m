@@ -76,7 +76,7 @@ classdef EncircleRect < ptb.bounds.CirclePrimitive
   methods (Access = public)
     
     function draw(obj, window, varargin)
-      if ( nargin < 2 )
+      if ( nargin < 2 || isempty(window) || ptb.isnull(window) )
         window = obj.Window;
       end
       
@@ -88,6 +88,8 @@ classdef EncircleRect < ptb.bounds.CirclePrimitive
     function [center, w, h] = get_center(obj)
       if ( ptb.isnull(obj.BaseRect) )
         center = nan( 1, 2 );
+        w = nan;
+        h = nan;
         return
       end
       

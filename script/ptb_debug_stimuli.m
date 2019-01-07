@@ -4,9 +4,8 @@ ptb.util.try_add_ptoolbox();
 
 Screen( 'Preference', 'VisualDebuglevel', 3 );
 
-w = ptb.Window( [0, 0, 200, 200] );
-w2 = ptb.Window( [200, 0, 400, 200] );
-% w = ptb.Window();
+w = ptb.Window( [0, 0, 600, 600] );
+w2 = ptb.Window( [600, 0, 1200, 600] );
 
 rect = ptb.stimuli.Rect( w );
 
