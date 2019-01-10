@@ -8,7 +8,11 @@ function code = get_escape_key_code()
 %       - `code` (double)
 
 if ( ispc() )
-  code = KbName( 'esc' );
+  try
+    code = KbName( 'esc' );
+  catch err
+    code = KbName( 'escape' );
+  end
 else
   code = KbName( 'escape' );
 end
