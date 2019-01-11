@@ -129,6 +129,10 @@ classdef XYTarget < handle
         bounds = ptb.bounds.Never();
       end
       
+      if ( nargin < 1 )
+        sampler = ptb.samplers.Void();
+      end
+      
       obj.Sampler = sampler;
       obj.Bounds = bounds;
       

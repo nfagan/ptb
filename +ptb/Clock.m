@@ -27,7 +27,7 @@ classdef Clock < handle
       
       %   RESET -- Reset clock to 0.
       %
-      %     See also ptb.Clock.Clock
+      %     See also ptb.Clock
       
       obj.timer = tic();
     end

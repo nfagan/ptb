@@ -44,7 +44,11 @@ classdef PolygonPrimitive < ptb.XYBounds
       
       vertices = get_vertices( obj );
       
-      tf = inpolygon( x, y, vertices(:, 1), vertices(:, 2) );
+      if ( isempty(vertices) )
+        tf = false;
+      else
+        tf = inpolygon( x, y, vertices(:, 1), vertices(:, 2) );
+      end
     end
     
     function draw(obj, window, color)

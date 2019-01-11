@@ -28,6 +28,11 @@ classdef Polygon < ptb.VisualStimulus
     TransformVertices = true;
   end
   
+  properties (Access = private)
+    last_drawn_pixel_vertices = [];
+    need_recalculate_vertices = true;
+  end
+  
   methods
     function obj = Polygon(varargin)
       
@@ -55,12 +60,14 @@ classdef Polygon < ptb.VisualStimulus
       end
       
       obj.Vertices = double( v );
+      obj.need_recalculate_vertices = true; %#ok
     end
     
     function set.TransformVertices(obj, v)
       validateattributes( v, {'numeric', 'logical'}, {'scalar'} ...
         , mfilename, 'TransformVertices' );
-      obj.IsCentroidOrigin = logical( v );
+      obj.TransformVertices = logical( v );
+      obj.need_recalculate_vertices = true; %#ok
     end
   end
   
@@ -71,13 +78,21 @@ classdef Polygon < ptb.VisualStimulus
         window = obj.Window;
       end
       
+      force_recalculate_vertices = true;
+      
       if ( ~ptb.Window.is_valid_window(window) )
+        finish_drawing( obj, [], force_recalculate_vertices );
         return
       end
       
-      verts = get_pixel_vertices( obj, window );
+      if ( obj.need_recalculate_vertices )
+        verts = get_pixel_vertices( obj, window );
+      else
+        verts = obj.last_drawn_pixel_vertices;
+      end
       
       if ( isempty(verts) )
+        finish_drawing( obj, [], force_recalculate_vertices );
         return
       end
       
@@ -95,6 +110,9 @@ classdef Polygon < ptb.VisualStimulus
       if ( isa(edge_color, 'ptb.Color') )
         Screen( 'FramePoly', window_handle, get(edge_color), verts );
       end
+      
+      force_recalculate_vertices = false;
+      finish_drawing( obj, verts, force_recalculate_vertices );
     end
     
     function [verts, centroid] = get_pixel_vertices(obj, window)
@@ -126,13 +144,13 @@ classdef Polygon < ptb.VisualStimulus
       end
       
       verts = obj.Vertices;
-      should_output_centroid = nargout > 1;
+      output_centroid = nargout > 1;
       
       if ( isempty(verts) )
         centroid = [];
         return
       elseif ( ~obj.TransformVertices )
-        if ( should_output_centroid )
+        if ( output_centroid )
           centroid = ptb.util.polygon_centroid( verts(:, 1), verts(:, 2) );
         end
         return
@@ -161,9 +179,18 @@ classdef Polygon < ptb.VisualStimulus
       
       verts = [ xv, yv ];
       
-      if ( should_output_centroid )
+      if ( output_centroid )
         centroid = ptb.util.polygon_centroid( xv, yv );
       end
+    end
+  end
+  
+  methods (Access = protected)
+    function finish_drawing(obj, vertices, force_recalculate)
+      obj.last_drawn_pixel_vertices = vertices;
+      obj.need_recalculate_vertices = force_recalculate || ...
+        obj.transform_changed_since_last_draw;
+      finish_drawing@ptb.VisualStimulus( obj );
     end
   end
 end

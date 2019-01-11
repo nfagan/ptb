@@ -7,7 +7,7 @@ rectangle.Scale = [100, 100];
 
 bounds = ptb.bounds.Rect( ptb.rects.MatchRectangle(rectangle) );
 
-source = ptb.MouseSource();
+source = ptb.sources.Mouse();
 
 sampler = ptb.samplers.Pass( source );
 

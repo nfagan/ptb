@@ -11,10 +11,10 @@ p = ptb.stimuli.Polygon( w );
 p.Position = 0.5;
 p.Position.Units = 'normalized';
 p.Scale = 100;
-p.FaceColor = ptb.Color.Green();
+p.FaceColor = ptb.Color.Red();
 
 % Square vertices
-p.Vertices = [ [0, 2, 2, 0]', [2, 2, 0, 0]' ];
+p.Vertices = [ [0, 1, 1, 0]', [1, 1, 0, 0]' ];
 
 open( w );
 ListenChar( 2 );
@@ -34,7 +34,7 @@ while ( ~ptb.util.is_esc_down )
   
   if ( state(5) )
     p.Position = 0.5;
-  else
+  elseif ( xs ~= 0 || ys ~= 0 )
     move( p, xs, ys );
   end
   

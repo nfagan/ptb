@@ -6,8 +6,17 @@ classdef XYBounds < handle
       %   XYBOUNDS -- Abstract interface to test if (X, Y) samples are in
       %     bounds.
       %
+      %     ptb.XYBounds describes an interface for determining if an (X,
+      %     Y) coordinate is or is not in bounds. As this class is an
+      %     interface, it is not meant to be used directly; instead, refer
+      %     to its subclasses for concrete implementations.
+      %
+      %     A ptb.XYBounds object will always have a test() method
+      %     indicating whether a given coordinate is or is not considered
+      %     in bounds.
+      %
       %     See also ptb.XYBounds.test, ptb.bounds.Always, 
-      %       ptb.bounds.Never, ptb.XYTarget
+      %       ptb.bounds.Never, ptb.bounds.Circle, ptb.XYTarget
       
     end
   end

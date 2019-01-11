@@ -47,7 +47,12 @@ classdef VisualStimulus < handle
     EdgeColor = ptb.Null();
   end
   
-  properties (Access = private)
+  properties (Access = protected)
+    
+    %   TRANSFORM_CHANGED_SINCE_LAST_DRAW -- True if Position or Scale
+    %     was updated since the last call to draw().
+    %
+    %     See also ptb.VisualStimulus
     transform_changed_since_last_draw = true;    
   end
   
