@@ -4,7 +4,7 @@ classdef Task < ptb.State
     is_new_state = false;
   end
   
-  properties (Access = public)
+  properties (Access = public, Transient = true)
     
     %   DESTRUCT -- Function to call when Task is being deleted.
     %
@@ -101,7 +101,9 @@ classdef Task < ptb.State
           continue;
         end
         
-        if ( obj.is_new_state )
+        was_new_state = obj.is_new_state;
+        
+        if ( was_new_state )
           entry( active_state );
           obj.is_new_state = false;
           called_state_loop = false;
@@ -115,7 +117,7 @@ classdef Task < ptb.State
           
           exit( active_state );
           set_next( obj, active_state.next_state ); %#ok
-        else
+        elseif ( ~was_new_state )
           loop( active_state );
           called_state_loop = true;
         end

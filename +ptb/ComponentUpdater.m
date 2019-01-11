@@ -30,7 +30,7 @@ classdef ComponentUpdater < handle
       %
       %     EXAMPLE //
       %
-      %       mouse = ptb.MouseSource();
+      %       mouse = ptb.sources.Mouse();
       %       sampler = ptb.samplers.Pass( mouse );
       %       updater = ptb.ComponentUpdater();
       %

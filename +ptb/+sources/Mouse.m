@@ -1,19 +1,19 @@
-classdef MouseSource < ptb.XYSource
+classdef Mouse < ptb.XYSource
   
   properties (Access = private)
     window_handle = 0;
   end
   
   methods
-    function obj = MouseSource(window_handle)
+    function obj = Mouse(window_handle)
       
-      %   MOUSESOURCE -- Create MouseSource object instance.
+      %   MOUSE -- Create Mouse object instance.
       %
-      %     obj = ptb.MouseSource() creates an interface for obtaining 
+      %     obj = ptb.sources.Mouse() creates an interface for obtaining 
       %     (X, Y) position samples from a mouse. Mouse position is given
       %     with respect to window 0 (i.e., the full desktop).
       %
-      %     obj = ptb.MouseSource( window_or_screen ) gets the mouse
+      %     obj = ptb.sources.Mouse( window_or_screen ) gets the mouse
       %     position with respect to the window or screen given by
       %     `window_or_screen`. An error is thrown if this index is
       %     invalid.
@@ -21,8 +21,8 @@ classdef MouseSource < ptb.XYSource
       %     The underlying mouse-position querying depends on the
       %     `GetMouse` function in Psychtoolbox.
       %
-      %     See also GetMouse, Screen, ptb.EyelinkSource,
-      %       ptb.MouseSource.update
+      %     See also GetMouse, Screen, ptb.sources.Eyelink,
+      %       ptb.sources.Mouse.update
       
       obj = obj@ptb.XYSource();
       
@@ -30,55 +30,13 @@ classdef MouseSource < ptb.XYSource
         window_handle = 0;
       else
         try
-          window_handle = ptb.MouseSource.validate_window_handle( window_handle );
+          window_handle = ptb.sources.Mouse.validate_window_handle( window_handle );
         catch err
           throw( err );
         end
       end
         
       obj.window_handle = window_handle;
-    end
-  end
-  
-  methods (Access = public)
-    function initialize(obj, varargin)
-      
-      %   INITIALIZE -- Dummy initialization.
-      %
-      %     See also ptb.MouseSource, ptb.EyelinkSource
-      
-    end
-    
-    function start_recording(obj, varargin)
-      
-      %   START_RECORDING -- Dummy start_recording.
-      %
-      %     See also ptb.MouseSource, ptb.EyelinkSource
-      
-    end
-    
-    function stop_recording(obj, varargin)
-      
-      %   STOP_RECORDING -- Dummy stop_recording.
-      %
-      %     See also ptb.MouseSource, ptb.EyelinkSource
-      
-    end
-    
-    function receive_file(obj, varargin)
-      
-      %   RECEIVE_FILE -- Dummy recieve_file.
-      %
-      %     See also ptb.MouseSource, ptb.EyelinkSource
-      
-    end
-    
-    function send_message(obj, varargin)
-      
-      %   SEND_MESSAGE -- Dummy send_message.
-      %
-      %     See also ptb.MouseSource, ptb.EyelinkSource
-      
     end
   end
   

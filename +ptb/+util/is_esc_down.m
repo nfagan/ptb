@@ -7,6 +7,6 @@ function tf = is_esc_down()
 %     OUT:
 %       - `tf` (logical)
 
-tf = ptb.util.is_key_down( ptb.util.get_escape_key_code() );
+tf = ptb.util.is_key_down( ptb.keys.esc() );
 
 end

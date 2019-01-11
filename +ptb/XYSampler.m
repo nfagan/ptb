@@ -4,8 +4,8 @@ classdef XYSampler < handle
     %   SOURCE -- Source of (X, Y) coordinates.
     %
     %     Source is a handle to an object that is a subclass of
-    %     ptb.XYSource, such as ptb.MouseSource or ptb.EyelinkSource. It is
-    %     the object from which (X, Y) coordinates are drawn.
+    %     ptb.XYSource, such as ptb.sources.Mouse or ptb.sources.Eyelink. 
+    %     It is the object from which (X, Y) coordinates are drawn.
     %
     %     See also ptb.XYSampler, ptb.XYSource
     Source = ptb.Null();

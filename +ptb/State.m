@@ -353,7 +353,7 @@ classdef State < handle
       %       - `key_code` (numeric)
       
       if ( nargin < 2 )
-        key_code = ptb.util.get_escape_key_code();
+        key_code = ptb.keys.esc();
       end
       
       condition = @() ptb.util.is_key_down( key_code );

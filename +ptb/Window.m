@@ -254,6 +254,15 @@ classdef Window < handle
       tf = ~isnan( wh ) && any( Screen('Windows') == wh );
     end
     
+    function r = get_rect(obj)
+      
+      %   GET_RECT -- Get Window rect as 4-element vector.
+      %
+      %     See also ptb.Window, ptb.Window.Rect
+      
+      r = get( obj.Rect );
+    end
+    
     function set_width(obj, w)
       
       %   SET_WIDTH -- Set window width.
@@ -436,7 +445,9 @@ classdef Window < handle
       end
       
       try
-        Screen( 'Close', obj.WindowHandle );
+        if ( is_window_handle_valid(obj) )
+          Screen( 'Close', obj.WindowHandle );
+        end
       catch err
         warning( ['An error occurred when attempting to close the window.' ...
           , ' This is most likely because the underlying window handle was' ...

@@ -109,8 +109,8 @@ classdef Color
       end
       
       obj.R = color(1);
-      obj.B = color(2);
-      obj.G = color(3);
+      obj.G = color(2);
+      obj.B = color(3);
       obj.A = a;
     end
   end
@@ -152,6 +152,22 @@ classdef Color
   methods (Access = public, Static = true)
     function c = ZeroOne()
       c = ptb.Color( 'Maximum', 1, 'IsInteger', false );
+    end
+    
+    function c = White()
+      c = set( ptb.Color(), [255, 255, 255] );
+    end
+    
+    function c = Red()
+      c = set( ptb.Color(), [255, 0, 0] );
+    end
+    
+    function c = Green()
+      c = set( ptb.Color(), [0, 255, 0] );
+    end
+    
+    function c = Blue()
+      c = set( ptb.Color(), [0, 0, 255] );
     end
   end
   

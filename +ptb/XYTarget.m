@@ -43,6 +43,24 @@ classdef XYTarget < handle
     %
     %     See also ptb.XYTarget, ptb.XYTarget.IsDurationMet
     Duration = inf;
+    
+    %   ENTRY -- Entry function.
+    %
+    %     Entry is a handle to a function that is called once upon entering
+    %     the target bounds. The function should accept a single argument
+    %     -- the target object instance -- and return no outputs.
+    %
+    %     See also ptb.XYTarget, ptb.XYTarget.Exit, ptb.XYTarget.Bounds
+    Entry = @(varargin) 1;
+    
+    %   EXIT -- Exit function.
+    %
+    %     Exit is a handle to a function that is called once upon exiting
+    %     the target bounds. The function should accept a single argument
+    %     -- the target object instance -- and return no outputs.
+    %
+    %     See also ptb.XYTarget, ptb.XYTarget.Exit, ptb.XYTarget.Bounds
+    Exit = @(varargin) 1;
   end
   
   properties (GetAccess = public, SetAccess = private)
@@ -78,6 +96,8 @@ classdef XYTarget < handle
   properties (Access = private)
     last_frame = nan;
     cumulative_timer;
+    
+    did_enter = false;
   end
   
   methods
@@ -142,6 +162,11 @@ classdef XYTarget < handle
       %       ptb.XYTarget.Duration
       
       obj.Cumulative = 0;
+      obj.last_frame = toc( obj.cumulative_timer );
+      obj.IsDurationMet = false;
+      obj.IsInBounds = false;
+      
+      obj.did_enter = false;
     end
     
     function update(obj)
@@ -157,7 +182,7 @@ classdef XYTarget < handle
       %
       %     See also ptb.XYTarget, ptb.XYTarget.Source
       
-      update( obj.Sampler );
+%       update( obj.Sampler );
       
       is_useable_sample = obj.Sampler.IsValidSample;
       
@@ -177,6 +202,17 @@ classdef XYTarget < handle
         obj.Cumulative = obj.Cumulative + delta;
       else
         obj.Cumulative = 0;
+      end
+      
+      should_call_entry = is_in_bounds && ~obj.did_enter;
+      should_call_exit = ~is_in_bounds && obj.did_enter;
+      
+      if ( should_call_entry )
+        obj.Entry( obj );
+        obj.did_enter = true;
+      elseif ( should_call_exit )
+        obj.Exit( obj );
+        obj.did_enter = false;
       end
       
       obj.IsInBounds = is_in_bounds;

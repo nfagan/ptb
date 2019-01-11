@@ -1,4 +1,4 @@
-classdef EyelinkSource < ptb.XYSource
+classdef Eyelink < ptb.XYSource
   
   properties (Access = private, Constant = true)
     uninitialized_error_id = 'EyelinkSource:record:EyelinkNotInitialized';
@@ -14,25 +14,25 @@ classdef EyelinkSource < ptb.XYSource
     file_name = '';
   end
   
-  properties (Access = public)
+  properties (Access = public, Transient = true)
     
     %   DESTRUCT -- Function to call on object deletion.
     %
     %     Destruct is a handle to a function that accepts one input -- the
-    %     ptb.EyelinkSource instance -- and returns no outputs, and is
+    %     ptb.sources.Eyelink instance -- and returns no outputs, and is
     %     called when the object is being deleted.
     %
-    %     See also ptb.EyelinkSource
+    %     See also ptb.sources.Eyelink
     Destruct = @(varargin) 1;
   end
   
-  properties (SetAccess = private, GetAccess = public)        
+  properties (SetAccess = private, GetAccess = public)   
     %   ISINITIALIZED -- True if Eyelink interface is initialized.
     %
     %     IsInitialized is a read-only logical scalar indicating whether
     %     the TCP/IP connection to Eyelink has been initialized.
     %
-    %     See also ptb.EyelinkSource, ptb.EyelinkSource.IsFileOpen
+    %     See also ptb.sources.Eyelink, ptb.sources.Eyelink.IsFileOpen
     IsInitialized = false;
     
     %   ISRECORDING -- True if the object is recording samples.
@@ -42,7 +42,7 @@ classdef EyelinkSource < ptb.XYSource
     %     whether those samples are being saved to disk on the Eyelink
     %     computer.
     %
-    %     See also ptb.EyelinkSource, ptb.EyelinkSource.IsFileOpen
+    %     See also ptb.sources.Eyelink, ptb.sources.Eyelink.IsFileOpen
     IsRecording = false;
     
     %   ISFILEOPEN -- True if edf file is open.
@@ -50,7 +50,7 @@ classdef EyelinkSource < ptb.XYSource
     %     IsFileOpen is a read-only logical scalar indicating whether an
     %     edf file is open on the tracker computer.
     %
-    %     See also ptb.EyelinkSource, ptb.EyelinkSource.IsRecording
+    %     See also ptb.sources.Eyelink, ptb.sources.Eyelink.IsRecording
     IsFileOpen = false;
     
     %   RECEIVEDFILE -- True if edf file was received.
@@ -59,26 +59,25 @@ classdef EyelinkSource < ptb.XYSource
     %     file specified during the call to `start_recording` was
     %     subsequently received.
     %
-    %     See also ptb.EyelinkSource, ptb.EyelinkSource.receive_file,
-    %       ptb.EyelinkSource.start_recording, ptb.EyelinkSource.Destruct
+    %     See also ptb.sources.Eyelink, ptb.sources.Eyelink.receive_file,
+    %       ptb.sources.Eyelink.start_recording, ptb.sources.Eyelink.Destruct
     ReceivedFile = false;
   end
   
   methods
-    function obj = EyelinkSource()
+    function obj = Eyelink()
       
-      %   EYELINKSOURCE -- Create EyelinkSource object instance.
+      %   EYELINK -- Create Eyelink source object instance.
       %
-      %     obj = ptb.EyelinkSource() creates an interface for obtaining 
+      %     obj = ptb.sources.Eyelink() creates an interface for obtaining 
       %     (X, Y) position samples from an Eyelink eyetracker, as well as
       %     saving those samples to disk.
       %
-      %     See also ptb.EyelinkSource.initialize,
-      %       ptb.EyelinkSource.update, ptb.EyelinkSource.start_recording,
-      %       ptb.MouseSource
+      %     See also ptb.sources.Eyelink.initialize,
+      %       ptb.sources.Eyelink.update, ptb.sources.Eyelink.start_recording,
+      %       ptb.sources.Mouse
       
       obj = obj@ptb.XYSource();
-      
       obj.eyelink_defaults = EyelinkInitDefaults();
     end
     
@@ -86,12 +85,12 @@ classdef EyelinkSource < ptb.XYSource
       
       %   DELETE -- Destructor.
       %
-      %     delete( obj ) is called when the ptb.EyelinkSource object is
+      %     delete( obj ) is called when the ptb.sources.Eyelink object is
       %     garbage-collected. It attempts to stop recording samples,
       %     printing a warning if an error occurs. It also calls the
       %     user-defineable Destruct function.
       %
-      %     See also ptb.EyelinkSource, ptb.EyelinkSource.Destruct
+      %     See also ptb.sources.Eyelink, ptb.sources.Eyelink.Destruct
       
       try
         stop_recording( obj );
@@ -123,7 +122,7 @@ classdef EyelinkSource < ptb.XYSource
       %   START_RECORDING -- Begin recording samples.
       %
       %     start_recording( obj ) attempts to begin recording samples from 
-      %     Eyelink. An error is thrown if the EyelinkSource is not 
+      %     Eyelink. An error is thrown if the sources.Eyelink is not 
       %     initialized, or if an attempt to start recording fails. Data
       %     are not saved on the Eyelink computer.
       %
@@ -133,8 +132,8 @@ classdef EyelinkSource < ptb.XYSource
       %     attempt to open the file fails, in which case recording is also 
       %     not started.
       %
-      %     See also ptb.EyelinkSource, ptb.EyelinkSource.stop_recording,
-      %       ptb.EyelinkSource.receive_file
+      %     See also ptb.sources.Eyelink, ptb.sources.Eyelink.stop_recording,
+      %       ptb.sources.Eyelink.receive_file
       %
       %     IN:
       %       - `filename` (char) |OPTIONAL|
@@ -169,7 +168,7 @@ classdef EyelinkSource < ptb.XYSource
       %     file is closed as well. An error is thrown in the case that the
       %     closing of a file fails.
       %
-      %     See also ptb.EyelinkSource, ptb.EyelinkSource.start_recording
+      %     See also ptb.sources.Eyelink, ptb.sources.Eyelink.start_recording
       
       if ( ~obj.IsRecording )
         return
@@ -200,7 +199,7 @@ classdef EyelinkSource < ptb.XYSource
       %     this function has no effect; otherwise, an error is thrown if
       %     the transfer fails.
       %
-      %     See also ptb.EyelinkSource, ptb.EyelinkSource.start_recording
+      %     See also ptb.sources.Eyelink, ptb.sources.Eyelink.start_recording
       %
       %     IN:
       %       - `dest` (char)
@@ -216,7 +215,7 @@ classdef EyelinkSource < ptb.XYSource
       end
       
       try
-        dest = char( ptb.EyelinkSource.validate_scalar_text(dest, 'destination') );
+        dest = char( ptb.sources.Eyelink.validate_scalar_text(dest, 'destination') );
       catch err
         throw( err );
       end
@@ -239,7 +238,7 @@ classdef EyelinkSource < ptb.XYSource
       %     file opened during a call to `start_recording`, unless it has
       %     already been received.
       %
-      %     See also ptb.EyelinkSource.receive_file
+      %     See also ptb.sources.Eyelink.receive_file
       
       if ( ~obj.ReceivedFile )
         receive_file( obj, dest );
@@ -254,7 +253,7 @@ classdef EyelinkSource < ptb.XYSource
       %     Eyelink tracker, throwing an error if the initialization is
       %     unsuccessful. 
       %
-      %     See also ptb.EyelinkSource
+      %     See also ptb.sources.Eyelink
       
       status = Eyelink( 'Initialize' );
       
@@ -279,15 +278,15 @@ classdef EyelinkSource < ptb.XYSource
       %     send_message( obj, message ) sends `message` to Eyelink.
       %     `message` must be a character vector.
       %
-      %     An error is thrown if the EyelinkSource is not initialized;
+      %     An error is thrown if the sources.Eyelink is not initialized;
       %     a warning is generated if the message fails to send.
       %
-      %     See also ptb.EyelinkSource, ptb.EyelinkSource.initialize
+      %     See also ptb.sources.Eyelink, ptb.sources.Eyelink.initialize
       %
       %     IN:
       %       - `message` (char)
       
-      ptb.EyelinkSource.validate_scalar_text( message, 'message' );
+      ptb.sources.Eyelink.validate_scalar_text( message, 'message' );
       
       if ( ~obj.IsInitialized )
         error( obj.uninitialized_error_id ...
@@ -305,7 +304,7 @@ classdef EyelinkSource < ptb.XYSource
   
   methods (Access = private)    
     function try_open_file(obj, file_name)
-      file_name = ptb.EyelinkSource.validate_scalar_text( file_name, 'filename' );
+      file_name = ptb.sources.Eyelink.validate_scalar_text( file_name, 'filename' );
       file_name = char( file_name );
 
       status = Eyelink( 'OpenFile', file_name );

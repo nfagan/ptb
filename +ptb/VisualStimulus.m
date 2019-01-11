@@ -47,6 +47,10 @@ classdef VisualStimulus < handle
     EdgeColor = ptb.Null();
   end
   
+  properties (Access = private)
+    transform_changed_since_last_draw = true;    
+  end
+  
   methods
     function obj = VisualStimulus(win)
       
@@ -74,10 +78,12 @@ classdef VisualStimulus < handle
     
     function set.Position(obj, v)
       obj.Position = set( obj.Position, v );
+      obj.transform_changed_since_last_draw = true; %#ok
     end
     
     function set.Scale(obj, v)
       obj.Scale = set( obj.Scale, v );
+      obj.transform_changed_since_last_draw = true; %#ok
     end
     
     function set.FaceColor(obj, color)
@@ -103,6 +109,22 @@ classdef VisualStimulus < handle
   end
   
   methods (Access = public)
+    function move(obj, x, y)
+      
+      %   MOVE -- Shift position.
+      %
+      %     move( obj, x, y ); adds `x` and `y` offsets to the current
+      %     Position. The units of `x` and `y` ought to (but need not)
+      %     match the units of Position.
+      %
+      %     See also ptb.VisualStimulus, ptb.VisualStimulus.Position
+      %
+      %     IN:
+      %       - `x` (double) |SCALAR|
+      %       - `y` (double) |SCALAR|
+      
+      obj.Position = get( obj.Position ) + [ x, y ];
+    end
     
     function b = clone(obj, constructor)
       
@@ -142,6 +164,10 @@ classdef VisualStimulus < handle
       if ( ~isa(color, 'ptb.Color') && ~ptb.isnull(color) )
         color = set( prop, color );
       end
+    end
+    
+    function finish_drawing(obj)
+      obj.transform_changed_since_last_draw = false;
     end
   end 
 end

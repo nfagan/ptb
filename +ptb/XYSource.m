@@ -32,7 +32,7 @@ classdef XYSource < handle
     %     IsValidSample is a read-only logical scalar indicating whether
     %     the current X and Y coordinates are valid. What it means for a
     %     sample to be valid is determined by the subclassing object --
-    %     for example, to an EyelinkSource, a valid sample is one that is
+    %     for example, to an sources.Eyelink, a valid sample is one that is
     %     not nan.
     %
     %     See also ptb.XYSource, ptb.XYSource.IsNewSample, ptb.XYSource.update
@@ -47,7 +47,7 @@ classdef XYSource < handle
       %     This class serves as an interface, and is not meant to be
       %     directly instantiated.
       %
-      %     See also ptb.MouseSource, ptb.EyelinkSource, ptb.XYSource.X,
+      %     See also ptb.sources.Mouse, ptb.sources.Eyelink, ptb.XYSource.X,
       %       ptb.XYSource.IsValidSample
       
     end
@@ -66,7 +66,7 @@ classdef XYSource < handle
       %     After calling this function, the IsNewSample and IsValidSample
       %     properties can be used to assess the state of the sample.
       %
-      %     See also ptb.EyelinkSource, ptb.MouseSource, ptb.XYSource,
+      %     See also ptb.sources.Eyelink, ptb.sources.Mouse, ptb.XYSource,
       %       ptb.XYSource.IsNewSample, ptb.XYSource.IsValidSample
       
       obj.IsNewSample = false;
