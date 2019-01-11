@@ -6,7 +6,8 @@ classdef Generator < ptb.XYSource
     %     SettableX is a double scalar giving the current x position, and
     %     is settable by the user.
     %
-    %     See also ptb.sources.Generator, ptb.sources.Generator.SettableY
+    %     See also ptb.sources.Generator, ptb.sources.Generator.SettableY,
+    %       ptb.sources.Generator.SettableIsValidSample
     SettableX = nan;
     
     %   SETTABLEX -- Y component, settable by the user.
@@ -16,6 +17,14 @@ classdef Generator < ptb.XYSource
     %
     %     See also ptb.sources.Generator, ptb.sources.Generator.X
     SettableY = nan;
+    
+    %   SETTABLEISVALIDSAMPLE -- IsValidSample, settable by the user.
+    %
+    %     SettableIsValidSample is a logical scalar indicating whether the
+    %     current SettableX and SettableY components are valid.
+    %
+    %     See also ptb.sources.Generator, ptb.sources.Generator.X
+    SettableIsValidSample = false;
   end
   
   methods
@@ -29,21 +38,35 @@ classdef Generator < ptb.XYSource
       %     to be generated programatically (i.e., rather than by a mouse
       %     or eye tracker).
       %
-      %     See also ptb.sources.Generator.SettableX, ptb.XYSource
+      %     See also ptb.sources.Generator.SettableX, ptb.XYSource,
+      %       ptb.sources.Generator.SettableIsValidSample
     end
     
-    function set_coordinate(obj, x, y)
+    function set_coordinate(obj, x, y, is_valid_sample)
       
       %   SET_COORDINATE -- Update x and y values at once.
+      %
+      %     set_coordinate( obj, x, y ); sets the SettableX and SettableY
+      %     properties to `x` and `y`, respectively, and indicates that
+      %     this sample is valid.
+      %
+      %     set_coordinate( ..., is_valid_sample ) indicates whether the
+      %     coordinate is considered valid.
       %
       %     See also ptb.sources.Generator
       %
       %     IN:
       %       - `x` (double)
       %       - `y` (double)
+      %       - `success` (logical)
+      
+      if ( nargin < 4 )
+        is_valid_sample = true;
+      end
       
       obj.SettableX = x;
       obj.SettableY = y;
+      obj.SettableIsValidSample = is_valid_sample;
     end
     
     function set.SettableX(obj, v)
@@ -55,6 +78,12 @@ classdef Generator < ptb.XYSource
       validateattributes( v, {'numeric'}, {'scalar'}, mfilename, 'SettableY' );
       obj.SettableY = v;
     end
+    
+    function set.SettableIsValidSample(obj, v)
+      validateattributes( v, {'numeric', 'logical'}, {'scalar'} ...
+        , mfilename, 'SettableIsValidSample' );
+      obj.SettableIsValidSample = logical( v );
+    end
   end
   
   methods (Access = protected)
@@ -65,7 +94,7 @@ classdef Generator < ptb.XYSource
     function [x, y, success] = get_latest_sample(obj)
       x = obj.SettableX;
       y = obj.SettableY;
-      success = true;
+      success = obj.SettableIsValidSample;
     end
   end
   
