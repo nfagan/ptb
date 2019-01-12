@@ -4,9 +4,18 @@ import ptb.keys.*;
 
 cleanup = onCleanup( @() ListenChar(0) );
 
-w = ptb.Window( [0, 0, 400, 400] );
+w = ptb.Window( [] );
+open( w );
 
 p = ptb.stimuli.Polygon( w );
+
+source =  ptb.sources.Mouse( w );
+sampler = ptb.samplers.Pass( source );
+bounds =  ptb.bounds.MatchPolygon( p );
+targ =    ptb.XYTarget( sampler, bounds );
+
+updater = ptb.ComponentUpdater();
+add_components( updater, targ, sampler, source );
 
 p.Position = 0.5;
 p.Position.Units = 'normalized';
@@ -16,16 +25,19 @@ p.FaceColor = ptb.Color.Red();
 % Square vertices
 p.Vertices = [ [0, 1, 1, 0]', [1, 1, 0, 0]' ];
 
-open( w );
 ListenChar( 2 );
 
 mv = 0.01;
+blue = ptb.Color.Blue;
+red = ptb.Color.Red;
 
 while ( ~ptb.util.is_esc_down )
+  update( updater );
+  
   xs = 0; % x-shift
   ys = 0; % y-shift
   
-  state = ptb.util.are_keys_down( left, right, up, down, KbName('c') );
+  state = ptb.util.are_keys_down( left, right, up, down, KbName('c'), space );
   
   if ( state(1) ), xs = xs - mv; end
   if ( state(2) ), xs = xs + mv; end
@@ -38,7 +50,14 @@ while ( ~ptb.util.is_esc_down )
     move( p, xs, ys );
   end
   
+  if ( state(6) || targ.IsInBounds )
+    p.FaceColor = blue;
+  else
+    p.FaceColor = red;
+  end
+  
   draw( p );
+  draw( bounds, w );
   flip( w );
 end
 

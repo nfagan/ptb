@@ -40,6 +40,8 @@ classdef Generator < ptb.XYSource
       %
       %     See also ptb.sources.Generator.SettableX, ptb.XYSource,
       %       ptb.sources.Generator.SettableIsValidSample
+      
+      obj = obj@ptb.XYSource();
     end
     
     function set_coordinate(obj, x, y, is_valid_sample)
