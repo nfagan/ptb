@@ -4,18 +4,17 @@ import ptb.keys.*;
 
 cleanup = onCleanup( @() ListenChar(0) );
 
-w = ptb.Window( [] );
-open( w );
+window = ptb.Window( [] );
+open( window );
 
-p = ptb.stimuli.Polygon( w );
-
-source =  ptb.sources.Mouse( w );
-sampler = ptb.samplers.Pass( source );
-bounds =  ptb.bounds.MatchPolygon( p );
-targ =    ptb.XYTarget( sampler, bounds );
+p = ptb.stimuli.Polygon( window );
 
 updater = ptb.ComponentUpdater();
-add_components( updater, targ, sampler, source );
+
+bounds =  ptb.bounds.MatchPolygon( p );
+source =  create_registered( updater, @ptb.sources.Mouse, window );
+sampler = create_registered( updater, @ptb.samplers.Pass, source );
+targ =    create_registered( updater, @ptb.XYTarget, sampler, bounds );
 
 p.Position = 0.5;
 p.Position.Units = 'normalized';
@@ -57,8 +56,8 @@ while ( ~ptb.util.is_esc_down )
   end
   
   draw( p );
-  draw( bounds, w );
-  flip( w );
+  draw( bounds, window );
+  flip( window );
 end
 
 end

@@ -123,6 +123,32 @@ classdef ComponentUpdater < handle
       update_component_set( obj, obj.Samplers );
       update_component_set( obj, obj.Targets );
     end
+    
+    function out = create_registered(obj, ctor, varargin)
+      
+      %   CREATE_REGISTERED -- Create and register component.
+      %
+      %     component = create_registered( obj, constructor, arg1, ... argN );
+      %     creates a source, sampler, or target component by calling its
+      %     `constructor`, a function handle, with optional arguments
+      %     `arg1` through `argN`. The component is then added to the
+      %     corresponding list of updateable components.
+      %
+      %     See also ptb.ComponentUpdater,
+      %       ptb.ComponentUpdater.add_component
+      
+      try
+        out = ctor( varargin{:} );
+      catch err
+        throw( err );
+      end
+      
+      try
+        add_component( obj, out );
+      catch err
+        throw( err );
+      end
+    end
   end
   
   methods (Access = private)
