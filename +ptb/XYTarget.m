@@ -10,7 +10,7 @@ classdef XYTarget < handle
     %     modifying them.
     %
     %     See also ptb.XYSampler, ptb.samplers.Pass, ptb.samplers.Missing
-    Sampler;
+    Sampler = ptb.samplers.Void();
     
     %   BOUNDS -- Object defining target boundaries.
     %
@@ -33,7 +33,7 @@ classdef XYTarget < handle
     %
     %     See also ptb.XYBounds, ptb.XYTarget, ptb.XYTarget.Source, 
     %       ptb.bounds.Always, ptb.bounds.Never, ptb.XYTarget.IsInBounds
-    Bounds;
+    Bounds = ptb.bounds.Never();
     
     %   DURATION -- Amount of cumulative time to be spent in bounds.
     %
@@ -125,16 +125,13 @@ classdef XYTarget < handle
       %       - `sampler` (ptb.XYSampler)
       %       - `bounds` (ptb.XYBounds) |OPTIONAL|
       
-      if ( nargin < 2 )
-        bounds = ptb.bounds.Never();
+      if ( nargin > 0 )
+        obj.Sampler = sampler;
       end
       
-      if ( nargin < 1 )
-        sampler = ptb.samplers.Void();
+      if ( nargin > 1 )
+        obj.Bounds = bounds;
       end
-      
-      obj.Sampler = sampler;
-      obj.Bounds = bounds;
       
       obj.cumulative_timer = tic;
     end

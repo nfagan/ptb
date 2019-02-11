@@ -109,6 +109,15 @@ classdef State < handle
     %
     %     See also ptb.State
     UserData = [];
+    
+    %   LOGFUNC -- Function to log messages.
+    %
+    %     LogFunc is a handle to a function that accepts a char vector, and
+    %     is called when the state logs messages (such as entering, or
+    %     exiting).
+    %
+    %     See also ptb.State, ptb.State.LogEntry
+    LogFunc = @fprintf;
   end
   
   properties (Access = private)
@@ -198,6 +207,11 @@ classdef State < handle
     function set.LogExit(obj, v)
       validateattributes( v, {'logical'}, {'scalar'}, mfilename, 'LogExit' );
       obj.LogExit = v;
+    end
+    
+    function set.LogFunc(obj, v)
+      validateattributes( v, {'function_handle'}, {'scalar'}, mfilename, 'LogFunc' );
+      obj.LogFunc = v;
     end
   end
   
@@ -372,7 +386,7 @@ classdef State < handle
       obj.should_escape = false;
       
       if ( obj.LogEntry )
-        fprintf( '\n Entered: %s', obj.Name );
+        log_message( obj, sprintf('\n Entered: %s', obj.Name) ); 
       end
       
       obj.Entry( obj );
@@ -382,7 +396,8 @@ classdef State < handle
       obj.Exit( obj );
       
       if ( obj.LogExit )
-        fprintf( '\n Exited:  %s (%0.3f s)', obj.Name, elapsed(obj) );
+        log_message( obj, sprintf('\n Exited:  %s (%0.3f s)', obj.Name ...
+          , elapsed(obj)) );
       end
     end
     
@@ -404,6 +419,14 @@ classdef State < handle
     
     function validate_state_function(obj, v, kind)  %#ok
       validateattributes( v, {'function_handle'}, {'scalar'}, mfilename, kind );
+    end
+    
+    function log_message(obj, message)
+      try
+        obj.LogFunc( message );
+      catch err
+        warning( err.message );
+      end
     end
     
     function add_duration_exit_condition(obj)

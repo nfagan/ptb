@@ -286,7 +286,7 @@ classdef Eyelink < ptb.XYSource
       %     IN:
       %       - `message` (char)
       
-      ptb.sources.Eyelink.validate_scalar_text( message, 'message' );
+%       ptb.sources.Eyelink.validate_scalar_text( message, 'message' );
       
       if ( ~obj.IsInitialized )
         error( obj.uninitialized_error_id ...

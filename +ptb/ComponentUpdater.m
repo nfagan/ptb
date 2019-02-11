@@ -47,7 +47,7 @@ classdef ComponentUpdater < handle
   end
   
   methods (Access = public)
-    function was_added = add_component(obj, component)
+    function was_added = add_component(obj, component, force_add)
       
       %   ADD_COMPONENT -- Add updateable component.
       %
@@ -69,6 +69,13 @@ classdef ComponentUpdater < handle
       %       - `component` (ptb.XYSource, ptb.XYSampler, ptb.XYTarget)
       %     OUT:
       %       - `was_added` (logical)
+      
+      if ( nargin < 3 )
+        force_add = false;
+      else
+        validateattributes( force_add, {'logical'}, {'scalar'} ...
+          , mfilename, 'check_if_should_add' );
+      end
             
       classes = obj.aggregate_classes;
       props = obj.aggregate_property_names;
@@ -78,7 +85,7 @@ classdef ComponentUpdater < handle
       
       for i = 1:N
         if ( isa(component, classes{i}) )
-          was_added = check_add_component( obj, component, props{i} );
+          was_added = check_add_component( obj, component, props{i}, force_add );
           return
         end
       end
@@ -107,6 +114,74 @@ classdef ComponentUpdater < handle
       for i = 1:numel(varargin)
         was_added(i) = add_component( obj, varargin{i} );
       end
+    end
+    
+    function was_removed = remove_component(obj, component)
+      
+      %   REMOVE_COMPONENT -- Remove registered component.
+      %
+      %     remove_component( obj, component ); tests whether `component`
+      %     is a handle to a source, sampler, or target currently
+      %     registered in `obj`. If it is, it is removed from the
+      %     corresponding component list.
+      %
+      %     was_removed = ... indicates whether the component was actually
+      %     removed.
+      %
+      %     See also ptb.ComponentUpdater,
+      %       ptb.ComponentUpdater.add_component
+      
+      was_removed = true;
+      
+      try
+        if ( check_remove_component(obj, component, 'Sources') )
+          return
+        elseif ( check_remove_component(obj, component, 'Samplers') )
+          return
+        elseif ( check_remove_component(obj, component, 'Targets') )
+          return
+        end
+      catch
+        % Ignore errors
+      end
+      
+      was_removed = false;
+    end
+    
+    function tf = remove_components(obj, varargin)
+      
+      %   REMOVE_COMPONENTS -- Remove any number of registered components.
+      %
+      %     remove_components( obj, component1, component2, ... ) removes
+      %     components 1 to N from `obj`, if they are present in `obj`. 
+      %
+      %     tf = ... returns a logical array whose true elements indicate
+      %     which components were removed.
+      %
+      %     See also ptb.ComponentUpdater,
+      %     ptb.ComponentUpdater.remove_component
+      
+      tf = cellfun( @(x) remove_component(obj, x), varargin );
+    end
+    
+    function reset(obj)
+      
+      %   RESET -- Remove all registered components.
+      %
+      %     See also ptb.ComponentUpdater,
+      %     ptb.ComponentUpdater.add_component,
+      %     ptb.ComponentUpdater.remove_component
+      
+      remove_components( obj, obj.Sources{:} );
+      remove_components( obj, obj.Samplers{:} );
+      remove_components( obj, obj.Targets{:} );
+    end
+    
+    function unique(obj)
+      
+      obj.Sources = unique( obj.Sources );
+      obj.Samplers = unique( obj.Samplers );
+      obj.Targets = unique( obj.Targets );
     end
     
     function update(obj)
@@ -152,15 +227,31 @@ classdef ComponentUpdater < handle
   end
   
   methods (Access = private)
-    function was_added = check_add_component(obj, component, aggregate)
+    function was_added = check_add_component(obj, component, aggregate, force_add)
       
       %   CHECK_ADD_COMPONENT -- Add component if not already added.
             
-      if ( ~any(cellfun(@(x) x == component, obj.(aggregate))) )
+      if ( force_add || ~any(cellfun(@(x) x == component, obj.(aggregate))) )
         obj.(aggregate){end+1} = component;
         was_added = true;
       else
         was_added = false;
+      end
+    end
+    
+    function was_removed = check_remove_component(obj, component, aggregate)
+      
+      %   CHECK_REMOVE_COMPONENT -- Remove component if it exists.
+      
+      check_func = @(x) x == component;
+      
+      is_present = cellfun( check_func, obj.(aggregate) );
+      was_removed = false;
+        
+      if ( nnz(is_present) > 0 )
+        obj.(aggregate)(is_present) = [];
+        was_removed = true;
+        return
       end
     end
     
