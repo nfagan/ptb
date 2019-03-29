@@ -101,12 +101,12 @@ classdef Polygon < ptb.VisualStimulus
       face_color = obj.FaceColor;
       edge_color = obj.EdgeColor;
       
-      % If facecolor is null or an Image, don't draw.
+      % Only draw if face color is a color object.
       if ( isa(face_color, 'ptb.Color') )
         Screen( 'FillPoly', window_handle, get(face_color), verts );
       end
       
-      % If edgecolor is null or an Image, don't draw.
+      % Only draw if edge color is a color object.
       if ( isa(edge_color, 'ptb.Color') )
         Screen( 'FramePoly', window_handle, get(edge_color), verts );
       end
@@ -182,6 +182,13 @@ classdef Polygon < ptb.VisualStimulus
       if ( output_centroid )
         centroid = ptb.util.polygon_centroid( xv, yv );
       end
+    end
+    
+    function b = clone(obj)
+      b = clone@ptb.VisualStimulus( obj, @ptb.stimuli.Polygon );
+      
+      b.Vertices = obj.Vertices;
+      b.TransformVertices = obj.TransformVertices;
     end
   end
   

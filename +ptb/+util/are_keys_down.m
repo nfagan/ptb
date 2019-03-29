@@ -13,13 +13,30 @@ function tf = are_keys_down(varargin)
 %     OUT:
 %       - `tf` (logical)
 
-[key_pressed, ~, key_code] = KbCheck();
-
-if ( ~key_pressed )
-  tf = false( size(varargin) );
+if ( nargin == 0 )
+  tf = logical( [] );
   return
 end
 
-tf = logical( cellfun(@(x) key_code(x), varargin) );
+if ( nargin == 1 )
+  code_array = varargin{1};
+else
+  code_array = varargin;
+end
+
+[key_pressed, ~, key_code] = KbCheck();
+
+if ( ~key_pressed )
+  tf = false( size(code_array) );
+  return
+end
+
+if ( nargin == 1 )
+  % Code array is double.
+  tf = logical( arrayfun(@(x) key_code(x), code_array) );
+else
+  % Code array is cell.
+  tf = logical( cellfun(@(x) key_code(x), code_array) );
+end
 
 end

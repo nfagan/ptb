@@ -103,6 +103,7 @@ classdef Rect < ptb.VisualStimulus
     
     function b = clone(obj)
       b = clone@ptb.VisualStimulus( obj, @ptb.stimuli.Rect );
+      
       b.Shape = obj.Shape;
     end
   end
