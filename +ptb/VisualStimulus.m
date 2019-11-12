@@ -10,23 +10,23 @@ classdef VisualStimulus < handle
     
     %   POSITION -- (X, Y) position of the stimulus.
     %
-    %     Position is an object of type ptb.Transform that represents the
-    %     (X, Y) position of the stimulus. Unless a subclass of
+    %     Position is an object of type ptb.WindowDependent that represents 
+    %     the (X, Y) position of the stimulus. Unless a subclass of
     %     ptb.VisualStimulus implements it differently, Position gives the
     %     centroid of the stimulus.
     %
-    %     See also ptb.VisualStimulus, ptb.Transform, 
+    %     See also ptb.VisualStimulus, ptb.WindowDependent, 
     %       ptb.VisualStimulus.Scale, ptb.VisualStimulus.FaceColor
-    Position = ptb.Transform();
+    Position = ptb.WindowDependent();
     
     %   SCALE -- (X, Y) scaling of the stimulus.
     %
-    %     Scale is an object of type ptb.Transform that represents the 
+    %     Scale is an object of type ptb.WindowDependent that represents the 
     %     (X, Y) scaling of the stimulus. In most cases, this is equivalent
     %     to setting the size of the stimulus.
     %
-    %     See also ptb.VisualStimulus, ptb.Transform
-    Scale = ptb.Transform();
+    %     See also ptb.VisualStimulus, ptb.WindowDependent
+    Scale = ptb.WindowDependent();
     
     %   FACECOLOR -- Color of the face of the stimulus.
     %
@@ -77,8 +77,8 @@ classdef VisualStimulus < handle
         obj.Window = win;
       end
       
-      obj.Position = ptb.Transform();
-      obj.Scale = ptb.Transform();
+      obj.Position = ptb.WindowDependent();
+      obj.Scale = ptb.WindowDependent();
     end
     
     function set.Position(obj, v)

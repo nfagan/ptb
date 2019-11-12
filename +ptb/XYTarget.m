@@ -120,10 +120,6 @@ classdef XYTarget < handle
       %
       %     See also ptb.XYTarget.Bounds, ptb.XYTarget.Sampler,
       %       ptb.XYTarget.Duration, ptb.XYBounds
-      %
-      %     IN:
-      %       - `sampler` (ptb.XYSampler)
-      %       - `bounds` (ptb.XYBounds) |OPTIONAL|
       
       if ( nargin > 0 )
         obj.Sampler = sampler;

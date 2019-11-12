@@ -27,7 +27,7 @@ classdef PolygonPrimitive < ptb.XYBounds
     %     ptb.PolygonPrimitive class, you must (and need only) implement
     %     this method.
     %
-    %     See also ptb.PolygonPrimitive, ptb.PolygonPrimitive.draw
+    %     See also ptb.bounds.PolygonPrimitive, ptb.bounds.PolygonPrimitive.draw
     get_vertices(obj);
   end
   
@@ -61,7 +61,7 @@ classdef PolygonPrimitive < ptb.XYBounds
       %     draw( obj, window, color ); uses `color` to style the outline.
       %     `color` is a 3- or 4-element vector.
       %
-      %     See also ptb.bounds.PolygonPrimitive, ptb.bounds.XYBounds
+      %     See also ptb.bounds.PolygonPrimitive, ptb.XYBounds
       
       if ( ~ptb.Window.is_valid_window(window) )
         return

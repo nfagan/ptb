@@ -162,8 +162,8 @@ classdef Polygon < ptb.VisualStimulus
       centroid = ptb.util.polygon_centroid( xv, yv );
       dists = ptb.util.distance( xv, yv, centroid(1), centroid(2) );
       
-      pos = get_pixel_value( obj.Position, window );
-      scl = get_pixel_value( obj.Scale, window );
+      pos = as_px( obj.Position, window );
+      scl = as_px( obj.Scale, window );
       
       xv = xv - centroid(1);
       yv = yv - centroid(2);

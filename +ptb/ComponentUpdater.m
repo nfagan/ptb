@@ -14,7 +14,7 @@ classdef ComponentUpdater < handle
   methods
     function obj = ComponentUpdater()
       
-      %   UPDATER -- Create ComponentUpdater object instance.
+      %   ComponentUpdater -- Create ComponentUpdater object instance.
       %
       %     obj = ptb.ComponentUpdater() creates an ComponentUpdater object 
       %     -- a utility that updates an arbitrary number of source, 

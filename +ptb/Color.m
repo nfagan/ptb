@@ -89,7 +89,8 @@ classdef Color
       %
       %     obj = set( obj, B ); where `B` is another ptb.Color object,
       %     attempts to assign the contents of `B` to `obj`. An error is
-      %     thrown if the contents of `B` 
+      %     thrown if the contents of `B` are incompatible with those of
+      %     `obj`.
       %
       %     See also ptb.Color, ptb.Color.get
       

@@ -122,9 +122,9 @@ classdef Eyelink < ptb.XYSource
       %   START_RECORDING -- Begin recording samples.
       %
       %     start_recording( obj ) attempts to begin recording samples from 
-      %     Eyelink. An error is thrown if the sources.Eyelink is not 
-      %     initialized, or if an attempt to start recording fails. Data
-      %     are not saved on the Eyelink computer.
+      %     Eyelink. An error is thrown if the object is not initialized, 
+      %     or if an attempt to start recording fails. Data are not saved 
+      %     on the Eyelink computer.
       %
       %     start_recording( obj, file_name ) attempts to open the file 
       %     `file_name` on the Eyelink computer before beginning to record 
@@ -134,9 +134,6 @@ classdef Eyelink < ptb.XYSource
       %
       %     See also ptb.sources.Eyelink, ptb.sources.Eyelink.stop_recording,
       %       ptb.sources.Eyelink.receive_file
-      %
-      %     IN:
-      %       - `filename` (char) |OPTIONAL|
       
       if ( ~obj.IsInitialized )
         error( obj.uninitialized_error_id ...
@@ -200,9 +197,6 @@ classdef Eyelink < ptb.XYSource
       %     the transfer fails.
       %
       %     See also ptb.sources.Eyelink, ptb.sources.Eyelink.start_recording
-      %
-      %     IN:
-      %       - `dest` (char)
       
       if ( obj.IsRecording )
         error( [obj.record_component, 'IsRecording'] ...
@@ -255,7 +249,13 @@ classdef Eyelink < ptb.XYSource
       %
       %     See also ptb.sources.Eyelink
       
-      status = Eyelink( 'Initialize' );
+      connection_status = Eyelink( 'IsConnected' );
+      
+      if ( connection_status == 0 )
+        status = Eyelink( 'Initialize' );
+      else
+        status = 0;
+      end
       
       if ( status ~= 0 )
         error( 'EyelinkSource:initialize:initialize' ...
@@ -278,13 +278,10 @@ classdef Eyelink < ptb.XYSource
       %     send_message( obj, message ) sends `message` to Eyelink.
       %     `message` must be a character vector.
       %
-      %     An error is thrown if the sources.Eyelink is not initialized;
-      %     a warning is generated if the message fails to send.
+      %     An error is thrown if the object is not initialized; a warning 
+      %     is generated if the message fails to send.
       %
       %     See also ptb.sources.Eyelink, ptb.sources.Eyelink.initialize
-      %
-      %     IN:
-      %       - `message` (char)
       
 %       ptb.sources.Eyelink.validate_scalar_text( message, 'message' );
       

@@ -1,17 +1,16 @@
-classdef Transform
+classdef WindowDependent
   
   properties (Access = public)
     %   VALUE -- Raw underlying vector value.
     %
-    %     Value is an 1xN vector of raw components, which may be scaled
-    %     depending on the value of Units. N is given by the NDimensions
-    %     property.
+    %     Value is an 1xN vector of raw components. N is given by the
+    %     NDimensions property.
     %
-    %     See also ptb.Transform, ptb.Transform.Units,
-    %       ptb.Transform.NDimensions
+    %     See also ptb.WindowDependent, ptb.WindowDependent.Units,
+    %       ptb.WindowDependent.NDimensions
     Value;
     
-    %   UNITS -- Units of the Transform.
+    %   UNITS -- Units of the WindowDependent.
     %
     %     Units is a char vector indicating the kind of units to use to
     %     scale the raw Value property. Units can be 'px', 'cm', or
@@ -26,7 +25,7 @@ classdef Transform
     %         window, in pixels. E.g., a Value of [0.5, 0.5] corresponds to
     %         half the pixel-width and half the pixel-height of the window.
     %
-    %     See also ptb.Transform, ptb.Transform.get_pixel_value.
+    %     See also ptb.WindowDependent, ptb.WindowDependent.as_px.
     Units = 'px';
   end
   
@@ -35,38 +34,48 @@ classdef Transform
   end
   
   properties (GetAccess = public, SetAccess = private)
-    %   NDIMENSIONS -- Number of dimensions of the Transform.
+    %   NDIMENSIONS -- Number of dimensions of the WindowDependent.
     %
     %     NDimensions is a read-only double scalar giving the number of
     %     dimensions, and thus the number of components, of Value.
     %
-    %     See also ptb.Transform, ptb.Transform.Value
+    %     See also ptb.WindowDependent, ptb.WindowDependent.Value
     NDimensions = 2;
     
     %   ISNONNEGATIVE -- True if components must be non-negative.
     %
     %     IsNonNegative is a read-only logical scalar indicating whether
-    %     the components of the Transform must be non-negative. If true,
-    %     attempting to set a component to a negative value will produce an
-    %     error.
+    %     the components of the WindowDependent must be non-negative. If 
+    %     true, attempting to set a component to a negative value will 
+    %     produce an error.
     %
-    %     See also ptb.Transform, ptb.Transform.Configured
+    %     See also ptb.WindowDependent, ptb.WindowDependent.Configured
     IsNonNegative = false;
   end
   
   methods
-    function obj = Transform(value, units, n_dimensions)
+    function obj = WindowDependent(value, units, n_dimensions)
       
-      %   TRANSFORM -- Create Transform object.
+      %   WindowDependent -- Create WindowDependent object.
       %
-      %     obj = ptb.Transform() creates a Transform object -- an object
-      %     that represents a vector quantity with selectable units.
+      %     obj = ptb.WindowDependent() creates a two-component vector
+      %     quantity whose components are understood to be expressed in
+      %     units that must be interpreted with respect to an on screen 
+      %     window. For example, the object might contain fractional values 
+      %     that are intended to be normalized to the pixel dimensions of 
+      %     the window. By default, units are 'px', or 
       %
-      %     Units are intended to be referenced to an on-screen
-      %     window.
+      %     obj = ptb.WindowDependent( value ); creates `obj` to contain
+      %     `value`, a two-component vector.
       %
-      %     See also ptb.Transform.Value, ptb.Transform.Units,
-      %       ptb.Transform.get_pixel_value, ptb.Transform.set
+      %     obj = ptb.WindowDependent( value, units ); specifies that 
+      %     `value` is in `units`.
+      %
+      %     obj = ptb.WindowDependent( value, units, num_dimensions );
+      %     sets the number of components allowed in `value`.
+      %
+      %     See also ptb.WindowDependent.Value, ptb.WindowDependent.Units,
+      %       ptb.WindowDependent.as_px, ptb.WindowDependent.set
       
       if ( nargin == 3 )
         obj.NDimensions = n_dimensions;
@@ -103,16 +112,17 @@ classdef Transform
       
       %   SET -- Set contents.
       %
-      %     A = set( A, B ), where `A` and `B` are both ptb.Transform
+      %     A = set( A, B ), where `A` and `B` are both ptb.WindowDependent
       %     objects, sets the Units and Value of `A` to those of `B`.
       %
-      %     A = set( obj, value ) where `obj` is a ptb.Transform object, and
-      %     `value` is a numeric array, sets the Value of `A` to `value`.
+      %     A = set( obj, value ) where `obj` is a ptb.WindowDependent 
+      %     object, and `value` is a numeric array, sets the Value of `A` 
+      %     to `value`.
       %
-      %     See also ptb.Transform, ptb.Transform.get_pixel_value
+      %     See also ptb.WindowDependent, ptb.WindowDependent.as_px
       
       try
-        if ( isa(B, 'ptb.Transform') )
+        if ( isa(B, 'ptb.WindowDependent') )
           obj.Value = B.Value;
           obj.Units = B.Units;
         else
@@ -129,35 +139,35 @@ classdef Transform
       %
       %     v = get( obj ); is the same as v = obj.Value;
       %
-      %     See also ptb.Transform
+      %     See also ptb.WindowDependent
       
       value = obj.Value;
     end
     
-    function out = get_pixel_value(obj, window)
+    function out = as_px(obj, window)
       
-      %   GET_PIXEL_VALUE -- Get value in pixels, accounting for Units.
+      %   AS_PX -- Get value in pixels.
       %
-      %     p = get_pixel_value( obj, window ); returns the value of the
-      %     object in pixels, taking into account the Units of `obj`, as
-      %     referenced to the ptb.Window object `window`.
+      %     p = as_px( obj, window ); returns the value of the
+      %     object in pixels, as referenced to the ptb.Window object 
+      %     `window`.
       %
       %     If Units is 'px', then p is the same as obj.Value.
       %
       %     If Units is 'normalized', then p is the value of obj.Value
-      %     normalized to the pixel width and height of `window`. If 
+      %     multiplied by the pixel width and height of `window`. If 
       %     `window` is Null, then the components of `p` are NaN. If `obj`
-      %     is one-dimensional, the component is normalized to the width of
+      %     is one-dimensional, the component is multiplied by the width of
       %     `window`. If `obj` has more than two dimensions, the
-      %     remaining dimensions are normalized to the width of `window`.
+      %     remaining dimensions are multiplied by the width of `window`.
       %
       %     If Units is 'cm', then p is the pixel value of obj.Value, using
       %     the physical width of `window` for reference. If `window`
       %     is Null, or the physical width of `window` is unset, 
       %     then the components of `p` are NaN.
       %
-      %     See also ptb.Transform, ptb.Transform.Value,
-      %       ptb.Transform.Units
+      %     See also ptb.WindowDependent, ptb.WindowDependent.Value,
+      %       ptb.WindowDependent.Units
       
       value = obj.Value;
       
@@ -202,31 +212,30 @@ classdef Transform
       end
     end
     
-    function out = get_normalized_value(obj, window)
+    function out = as_normalized(obj, window)
       
-      %   GET_NORMALIZED_VALUE -- Get value in normalized units, 
-      %     accounting for current Units.
+      %   AS_NORMALIZED -- Get value in normalized units.
       %
-      %     p = get_normalized_value( obj, window ); returns the value of 
+      %     p = as_normalized( obj, window ); returns the value of 
       %     the object as normalized to the pixel width and height of
       %     `window`.
       %
       %     If Units is 'normalized', then p is the same as obj.Value.
       %
-      %     If Units is 'px', then p is the value of obj.Value
-      %     normalized to the pixel width and height of `window`. If 
-      %     `window` is Null, then the components of `p` are NaN. If `obj`
-      %     is one-dimensional, the component is normalized to the width of
-      %     `window`. If `obj` has more than two dimensions, the
-      %     remaining dimensions are normalized to the width of `window`.
+      %     If Units is 'px', then p is obj.Value normalized to the pixel 
+      %     width and height of `window`. If `window` is Null, then the 
+      %     components of `p` are NaN. If `obj` is one-dimensional, the 
+      %     component is normalized to the width of `window`. If `obj` has 
+      %     more than two dimensions, the remaining dimensions are 
+      %     normalized to the width of `window`.
       %
       %     If Units is 'cm', then p is the normalized value of obj.Value, 
       %     using the physical width of `window` for reference. If `window`
       %     is Null, or the physical width of `window` is unset, 
       %     then the components of `p` are NaN.
       %
-      %     See also ptb.Transform, ptb.Transform.Value,
-      %       ptb.Transform.Units
+      %     See also ptb.WindowDependent, ptb.WindowDependent.Value,
+      %       ptb.WindowDependent.Units
       
       value = obj.Value;
       
@@ -300,16 +309,16 @@ classdef Transform
   methods (Access = public, Static = true)
     function t = Configured(varargin)
       
-      %   CONFIGURED -- Create ptb.Transform configured with read-only
+      %   CONFIGURED -- Create ptb.WindowDependent configured with read-only
       %     property values.
       %
-      %     t = ptb.Transform.Configured( 'name1', value1, ... ) creates a
-      %     ptb.Transform object `t` whose property values are set in
-      %     'name', value pairs. This is the only way to set certain
-      %     properties such as IsNonNegative, which cannot be changed after 
-      %     `t` is created.
+      %     t = ptb.WindowDependent.Configured( 'name1', value1, ... ) 
+      %     creates a ptb.WindowDependent object `t` whose property values 
+      %     are set in 'name', value pairs. This is the only way to set 
+      %     certain properties such as IsNonNegative, which cannot be 
+      %     changed after `t` is created.
       %
-      %     See also ptb.Transform, ptb.Transform.IsNonNegative
+      %     See also ptb.WindowDependent, ptb.WindowDependent.IsNonNegative
       
       p = inputParser();
       
@@ -325,7 +334,7 @@ classdef Transform
       
       results = p.Results;
       
-      t = ptb.Transform( nan, results.Units, results.NDimensions );
+      t = ptb.WindowDependent( nan, results.Units, results.NDimensions );
       
       t.IsNonNegative = results.IsNonNegative;
       
@@ -344,7 +353,7 @@ classdef Transform
         units = 'px';
       end
       
-      t = ptb.Transform( value, units, 1 );
+      t = ptb.WindowDependent( value, units, 1 );
     end
   end
 end

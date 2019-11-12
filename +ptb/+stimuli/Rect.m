@@ -84,8 +84,8 @@ classdef Rect < ptb.VisualStimulus
         window = obj.Window;
       end
       
-      scale = get_pixel_value( obj.Scale, window );
-      position = get_pixel_value( obj.Position, window );
+      scale = as_px( obj.Scale, window );
+      position = as_px( obj.Position, window );
       
       w2 = scale(1) / 2;
       h2 = scale(2) / 2;

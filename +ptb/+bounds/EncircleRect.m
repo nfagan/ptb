@@ -26,10 +26,10 @@ classdef EncircleRect < ptb.bounds.CirclePrimitive
     
     %   PADDING -- Padding to be applied to the circle's radius.
     %
-    %     Padding is a ptb.Transform object representing an amount of
+    %     Padding is a ptb.WindowDependent object representing an amount of
     %     padding that should be applied to the radius of the bounding
     %     circle. Values larger than 0 expand the bounding circle.
-    Padding = ptb.Transform.OneDimensional();
+    Padding = ptb.WindowDependent.OneDimensional();
   end
   
   methods
@@ -115,7 +115,7 @@ classdef EncircleRect < ptb.bounds.CirclePrimitive
       % Distance between center and corner of rect
       base_radius = ptb.util.distance( center(1), center(2), x2, y2 );
       
-      radius = base_radius + get_pixel_value( obj.Padding, obj.Window );            
+      radius = base_radius + as_px( obj.Padding, obj.Window );            
     end
   end
   

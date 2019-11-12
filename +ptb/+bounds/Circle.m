@@ -15,7 +15,7 @@ classdef Circle < ptb.bounds.CirclePrimitive
     
     %   CENTER -- (X, Y) center of the bounding circle.
     %
-    %     Center is a ptb.Transform object representing the (X, Y) center
+    %     Center is a ptb.WindowDependent object representing the (X, Y) center
     %     of the circle. The default units are 'px'.
     %
     %     If the units are not 'px' -- i.e., if the value of Center depends
@@ -23,12 +23,12 @@ classdef Circle < ptb.bounds.CirclePrimitive
     %     Window property, or else the components of Center will be NaN.
     %
     %     See also ptb.bounds.Circle, ptb.bounds.Circle.Window, 
-    %       ptb.Transform, ptb.bounds.Circle.Radius
-    Center = ptb.Transform( nan );
+    %       ptb.WindowDependent, ptb.bounds.Circle.Radius
+    Center = ptb.WindowDependent( nan );
     
     %   RADIUS -- Radius of the bounding circle.
     %
-    %     Radius is a ptb.Transform object representing the radius
+    %     Radius is a ptb.WindowDependent object representing the radius
     %     of the circle. The default units are 'px'.
     %
     %     If the units are not 'px' -- i.e., if the value of Radius depends
@@ -36,8 +36,8 @@ classdef Circle < ptb.bounds.CirclePrimitive
     %     Window property, or else the value of Radius will be NaN.
     %
     %     See also ptb.bounds.Circle, ptb.bounds.Circle.Window, 
-    %       ptb.Transform
-    Radius = ptb.Transform.Configured( 'NDimensions', 1, 'IsNonNegative', true );
+    %       ptb.WindowDependent
+    Radius = ptb.WindowDependent.Configured( 'NDimensions', 1, 'IsNonNegative', true );
   end
   
   methods
@@ -75,11 +75,11 @@ classdef Circle < ptb.bounds.CirclePrimitive
   
   methods (Access = protected)
     function center = get_center(obj)
-      center = get_pixel_value( obj.Center, obj.Window );
+      center = as_px( obj.Center, obj.Window );
     end
     
     function radius = get_radius(obj)
-      radius = get_pixel_value( obj.Radius, obj.Window );
+      radius = as_px( obj.Radius, obj.Window );
     end
   end
 end
