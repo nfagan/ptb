@@ -63,7 +63,7 @@ classdef WindowDependent
       %     units that must be interpreted with respect to an on screen 
       %     window. For example, the object might contain fractional values 
       %     that are intended to be normalized to the pixel dimensions of 
-      %     the window. By default, units are 'px', or 
+      %     the window. By default, units are 'px'.
       %
       %     obj = ptb.WindowDependent( value ); creates `obj` to contain
       %     `value`, a two-component vector.

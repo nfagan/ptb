@@ -179,8 +179,6 @@ classdef XYTarget < handle
       %
       %     See also ptb.XYTarget, ptb.XYTarget.Source
       
-%       update( obj.Sampler );
-      
       is_useable_sample = obj.Sampler.IsValidSample;
       
       if ( is_useable_sample )
