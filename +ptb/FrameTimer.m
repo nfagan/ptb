@@ -87,7 +87,9 @@ classdef FrameTimer < handle
         return
       end
       
-      delta = toc( obj.timer ) - obj.last_frame;
+      current_frame = toc( obj.timer );
+      delta = current_frame - obj.last_frame;
+      obj.last_frame = current_frame;
       
       if ( obj.Iteration == 0 )
         obj.Mean = delta;
