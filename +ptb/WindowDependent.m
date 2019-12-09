@@ -10,27 +10,37 @@ classdef WindowDependent
     %       ptb.WindowDependent.NDimensions
     Value;
     
-    %   UNITS -- Units of the WindowDependent.
+    %   UNITS -- Units of the WindowDependent object's Value.
     %
     %     Units is a char vector indicating the kind of units to use to
-    %     scale the raw Value property. Units can be 'px', 'cm', or
-    %     'normalized'.
+    %     scale the raw Value property. Units can be 'px', 'length',
+    %     'normalized', or 'degrees'. These are:
     %
     %       - 'px': Pixels. The components of Value are taken to be in
     %         pixels, and will be unscaled.
-    %       - 'cm': cm. The components of Value are taken to be in cm, and
-    %         will be scaled to the physical dimensions of the window.
+    %
     %       - 'normalized': Normalized. The components of Value are taken
     %         to be fractional with respect to the width and height of the
     %         window, in pixels. E.g., a Value of [0.5, 0.5] corresponds to
     %         half the pixel-width and half the pixel-height of the window.
     %
-    %     See also ptb.WindowDependent, ptb.WindowDependent.as_px.
+    %       - 'length': The components of Value are expressed in the same
+    %         physical units, such as cm, as the PhysicalDimensions of the 
+    %         window.
+    %
+    %       - 'degrees': Degrees of visual angle. The components of Value
+    %         are expressed in degrees of visual angle, and must be
+    %         interpreted with respect to a) the physical height of the 
+    %         window and b) the viewing distance between the subject and
+    %         the monitor.
+    %
+    %     See also ptb.WindowDependent, ptb.WindowDependent.as_px,
+    %       ptb.Window.PhysicalDimensions, ptb.Window.ViewDistance
     Units = 'px';
   end
   
   properties (GetAccess = public, Constant = true)
-    UnitKinds = { 'cm', 'px', 'normalized' };
+    UnitKinds = { 'length', 'px', 'normalized', 'degrees' };
   end
   
   properties (GetAccess = public, SetAccess = private)
@@ -58,18 +68,20 @@ classdef WindowDependent
       
       %   WindowDependent -- Create WindowDependent object.
       %
-      %     obj = ptb.WindowDependent() creates a two-component vector
-      %     quantity whose components are expressed in units that must be 
-      %     interpreted with respect to an on screen window. For example, 
-      %     the object might contain fractional values that are intended to 
-      %     be normalized to the pixel dimensions of the window. By default, 
-      %     units are 'px'.
+      %     A ptb.WindowDependent object represents a vector quantity whose
+      %     value must be interpreted with respect to an onscreen window,
+      %     according to its units. For example, the object might contain 
+      %     fractional values that are intended to be normalized to the 
+      %     pixel dimensions of the window.
       %
-      %     obj = ptb.WindowDependent( value ); creates `obj` to contain
+      %     obj = ptb.WindowDependent(); creates a two-component vector
+      %     quantity with units 'px'.
+      %
+      %     obj = ptb.WindowDependent( value ); sets `obj` to contain
       %     `value`, a two-component vector.
       %
-      %     obj = ptb.WindowDependent( value, units ); specifies that 
-      %     `value` is in `units`.
+      %     obj = ptb.WindowDependent( value, units ); indicates that 
+      %     `value` is expressed in `units`.
       %
       %     obj = ptb.WindowDependent( value, units, num_dimensions );
       %     sets the number of components allowed in `value`.
@@ -144,6 +156,33 @@ classdef WindowDependent
       value = obj.Value;
     end
     
+    function obj = in_px(obj, varargin)
+      
+      %   IN_PX -- Object with value in pixels.
+      %
+      %     out = in_px( obj, window ); converts Value to pixels, and
+      %     returns a new object `out` containing this value.
+      %
+      %     See also ptb.WindowDependent, ptb.WindowDependent.as_px
+      
+      obj.Value = as_px( obj, varargin{:} );
+      obj.Units = 'px';
+    end
+    
+    function obj = in_normalized(obj, varargin)
+      
+      %   IN_NORMALIZED -- Object with value in normalized units.
+      %
+      %     out = in_normalized( obj, window ); converts Value such that
+      %     it is fractional with respect to the pixel dimensions of
+      %     `window`, and returns a new object `out` containing this value.
+      %
+      %     See also ptb.WindowDependent, ptb.WindowDependent.as_normalized
+      
+      obj.Value = as_normalized( obj, varargin{:} );
+      obj.Units = 'normalized';
+    end
+    
     function out = as_px(obj, window)
       
       %   AS_PX -- Get value in pixels.
@@ -161,13 +200,14 @@ classdef WindowDependent
       %     `window`. If `obj` has more than two dimensions, the
       %     remaining dimensions are multiplied by the width of `window`.
       %
-      %     If Units is 'cm', then p is the pixel value of obj.Value, using
-      %     the physical dimensions of `window` for reference. If `window`
-      %     is Null, or the physical dimensions of `window` are unset, then 
-      %     the components of `p` are NaN. If `obj` is one-dimensional, the 
-      %     component is scaled by the physical width of `window`. If `obj` 
-      %     has more than two dimensions, the remaining dimensions are 
-      %     scaled by the physical width of `window`.
+      %     If Units is 'length', then p is the pixel value of obj.Value, 
+      %     using the physical dimensions of `window` for reference. If 
+      %     `window` is Null, or the physical dimensions of `window` are 
+      %     unset, then the components of `p` are NaN. If `obj` is 
+      %     one-dimensional, the component is scaled by the physical width 
+      %     of `window`. If `obj` has more than two dimensions, the 
+      %     remaining dimensions are scaled by the physical width of 
+      %     `window`.
       %
       %     See also ptb.WindowDependent, ptb.WindowDependent.Value,
       %       ptb.WindowDependent.Units
@@ -191,7 +231,28 @@ classdef WindowDependent
       h = window.Height;
       
       switch ( obj.Units )
-        case 'cm'
+        case 'normalized'
+          out = value;
+          
+          out(1) = w * value(1);
+          
+          if ( obj.NDimensions > 1 )
+            out(2) = h * value(2);
+          end
+          
+          if ( obj.NDimensions > 2 )
+            % Normalize remaining dimensions to width.
+            out(3:end) = w * out(3:end);
+          end
+          
+        case 'degrees'
+          view_distance = window.ViewDistance;
+          physical_height = window.PhysicalDimensions(2);
+          deg_per_px = rad2deg( atan2(0.5 * physical_height, view_distance) ) / (0.5 * h);
+          px_per_deg = 1 / deg_per_px;
+          out = value * px_per_deg;
+          
+        case 'length'
           physical_dimensions = window.PhysicalDimensions;
           ratio_px_cm_w = w / physical_dimensions(1);
           ratio_px_cm_h = h / physical_dimensions(2);
@@ -205,20 +266,6 @@ classdef WindowDependent
           
           if ( obj.NDimensions > 2 )
             out(3:end) = out(3:end) * ratio_px_cm_w;
-          end
-          
-        case 'normalized'
-          out = value;
-          
-          out(1) = w * value(1);
-          
-          if ( obj.NDimensions > 1 )
-            out(2) = h * value(2);
-          end
-          
-          if ( obj.NDimensions > 2 )
-            % Normalize remaining dimensions to width.
-            out(3:end) = w * out(3:end);
           end
         otherwise
           error( 'Unrecognized units "%s".', obj.Units );
@@ -242,7 +289,7 @@ classdef WindowDependent
       %     more than two dimensions, the remaining dimensions are 
       %     normalized to the width of `window`.
       %
-      %     If Units is 'cm', then p is the normalized value of obj.Value, 
+      %     If Units is 'length', then p is the normalized value of obj.Value, 
       %     using the physical dimensions of `window` for reference. If 
       %     `window` is Null, or the physical width of `window` is unset,
       %     then the components of `p` are NaN.
@@ -267,11 +314,11 @@ classdef WindowDependent
       h = window.Height;
       
       switch ( obj.Units )
-        case 'cm'
-          out = get_normalized_value_from_px( obj, as_px(obj, window), w, h );
-          
         case 'px'
           out = get_normalized_value_from_px( obj, value, w, h );
+          
+        case {'length', 'degrees'}
+          out = get_normalized_value_from_px( obj, as_px(obj, window), w, h );
           
         otherwise
           error( 'Unrecognized units "%s".', obj.Units );

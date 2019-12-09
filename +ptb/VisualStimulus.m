@@ -158,9 +158,6 @@ classdef VisualStimulus < handle
     %     function has no effect, and no error is raised.
     %
     %     See also ptb.VisualStimulus
-    %
-    %     IN:
-    %       - `window` (ptb.Window) |OPTIONAL|
     draw(obj, window);
   end
   

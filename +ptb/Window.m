@@ -34,6 +34,15 @@ classdef Window < handle
     %     See also ptb.Window, ptb.Window.Rect
     PhysicalDimensions = nan( 1, 2 );
     
+    %   VIEWDISTANCE -- Physical distance between the subject and monitor.
+    %
+    %     ViewDistance is a non-negative scalar value giving the distance
+    %     between the subject and the monitor. Units should be consistent
+    %     with those of PhysicalDimensions.
+    %
+    %     See also ptb.Window, ptb.Window.PhysicalDimensions
+    ViewDistance = nan;
+    
     %   BACKGROUNDCOLOR -- Background color of the Window.
     %
     %     BackgroundColor is a three-element vector giving the
@@ -171,6 +180,14 @@ classdef Window < handle
       end
       
       obj.PhysicalDimensions = double( dims(:)' );
+    end
+    
+    function set.ViewDistance(obj, to)
+      validateattributes( to, {'numeric'}, {'numel', 1, 'nonnegative'} ...
+        , mfilename, 'view distance' ...
+      );
+    
+      obj.ViewDistance = to;
     end
     
     function set.Rect(obj, rect)
