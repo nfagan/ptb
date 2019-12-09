@@ -19,7 +19,7 @@ classdef WindowDependent
     %       - 'px': Pixels. The components of Value are taken to be in
     %         pixels, and will be unscaled.
     %       - 'cm': cm. The components of Value are taken to be in cm, and
-    %         will be scaled to the physical width of the window.
+    %         will be scaled to the physical dimensions of the window.
     %       - 'normalized': Normalized. The components of Value are taken
     %         to be fractional with respect to the width and height of the
     %         window, in pixels. E.g., a Value of [0.5, 0.5] corresponds to
@@ -59,11 +59,11 @@ classdef WindowDependent
       %   WindowDependent -- Create WindowDependent object.
       %
       %     obj = ptb.WindowDependent() creates a two-component vector
-      %     quantity whose components are understood to be expressed in
-      %     units that must be interpreted with respect to an on screen 
-      %     window. For example, the object might contain fractional values 
-      %     that are intended to be normalized to the pixel dimensions of 
-      %     the window. By default, units are 'px'.
+      %     quantity whose components are expressed in units that must be 
+      %     interpreted with respect to an on screen window. For example, 
+      %     the object might contain fractional values that are intended to 
+      %     be normalized to the pixel dimensions of the window. By default, 
+      %     units are 'px'.
       %
       %     obj = ptb.WindowDependent( value ); creates `obj` to contain
       %     `value`, a two-component vector.
@@ -162,9 +162,12 @@ classdef WindowDependent
       %     remaining dimensions are multiplied by the width of `window`.
       %
       %     If Units is 'cm', then p is the pixel value of obj.Value, using
-      %     the physical width of `window` for reference. If `window`
-      %     is Null, or the physical width of `window` is unset, 
-      %     then the components of `p` are NaN.
+      %     the physical dimensions of `window` for reference. If `window`
+      %     is Null, or the physical dimensions of `window` are unset, then 
+      %     the components of `p` are NaN. If `obj` is one-dimensional, the 
+      %     component is scaled by the physical width of `window`. If `obj` 
+      %     has more than two dimensions, the remaining dimensions are 
+      %     scaled by the physical width of `window`.
       %
       %     See also ptb.WindowDependent, ptb.WindowDependent.Value,
       %       ptb.WindowDependent.Units
@@ -190,9 +193,19 @@ classdef WindowDependent
       switch ( obj.Units )
         case 'cm'
           physical_dimensions = window.PhysicalDimensions;
-          ratio_px_cm = w ./ physical_dimensions(1);
+          ratio_px_cm_w = w / physical_dimensions(1);
+          ratio_px_cm_h = h / physical_dimensions(2);
           
-          out = value * ratio_px_cm;
+          out = value;
+          out(1) = out(1) * ratio_px_cm_w;
+          
+          if ( obj.NDimensions > 1 )
+            out(2) = out(2) * ratio_px_cm_h;
+          end
+          
+          if ( obj.NDimensions > 2 )
+            out(3:end) = out(3:end) * ratio_px_cm_w;
+          end
           
         case 'normalized'
           out = value;
@@ -230,8 +243,8 @@ classdef WindowDependent
       %     normalized to the width of `window`.
       %
       %     If Units is 'cm', then p is the normalized value of obj.Value, 
-      %     using the physical width of `window` for reference. If `window`
-      %     is Null, or the physical width of `window` is unset, 
+      %     using the physical dimensions of `window` for reference. If 
+      %     `window` is Null, or the physical width of `window` is unset,
       %     then the components of `p` are NaN.
       %
       %     See also ptb.WindowDependent, ptb.WindowDependent.Value,
@@ -255,12 +268,8 @@ classdef WindowDependent
       
       switch ( obj.Units )
         case 'cm'
-          physical_dimensions = window.PhysicalDimensions;
-          ratio_px_cm = w ./ physical_dimensions(1);
+          out = get_normalized_value_from_px( obj, as_px(obj, window), w, h );
           
-          value = value * ratio_px_cm;
-          
-          out = get_normalized_value_from_px( obj, value, w, h );
         case 'px'
           out = get_normalized_value_from_px( obj, value, w, h );
           
