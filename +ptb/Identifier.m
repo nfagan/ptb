@@ -24,10 +24,10 @@ classdef Identifier < handle
       
       %   EQ -- True for identifiers with the same id.
       %
-      %     tf = eq( A, B ) is called when either `A` or `B` is a 
-      %     ptb.Identifier object. `tf` is a scalar logical indicating
-      %     whether `A` and `B` are both ptb.Identifier objects with the
-      %     same underlying id.
+      %     tf = eq( A, B ) is called for the syntax A == B when either 
+      %     `A` or `B` is a ptb.Identifier object. `tf` is a scalar logical 
+      %     indicating whether `A` and `B` are both ptb.Identifier objects 
+      %     with the same underlying id.
       %
       %     If `A` and `B` are ptb.Identifier object arrays, then their 
       %     sizes must match, or else one can be scalar, and the result 
