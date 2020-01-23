@@ -34,6 +34,8 @@ classdef SingleScanInput < handle
       %     See also ptb.signal.SingleScanInput.LatestSample,
       %       ptb.signal.SingleScanInput.update
       
+      validateattributes( session, {'daq.Session'}, {'scalar'} ...
+        , mfilename, 'session' );
       obj.session = session;
     end
     
