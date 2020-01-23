@@ -39,11 +39,6 @@ classdef SingleScanInput < handle
       obj.session = session;
     end
     
-    function set.session(obj, v)
-      % TODO: Determine the return type of `daq.createSession`
-      obj.session = v;
-    end
-    
     function s = get_latest_sample(obj)
       
       %   GET_LATEST_SAMPLE -- Return the LatestSample property value.

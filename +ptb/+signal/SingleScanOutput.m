@@ -56,9 +56,9 @@ classdef SingleScanOutput < handle
       %     an immediate-mode / on-demand fashion. That is, values are only
       %     output upon an explicit call to an `update` function.
       %
-      %     See also ptb.signal.SingleScanInput.queue_value,
-      %       ptb.signal.SingleScanInput.write_value,
-      %       ptb.signal.SingleScanInput.update
+      %     See also ptb.signal.SingleScanOutput.queue_value,
+      %       ptb.signal.SingleScanOutput.write_value,
+      %       ptb.signal.SingleScanOutput.update
       
       validateattributes( session, {'daq.Session'}, {'scalar'} ...
         , mfilename, 'session' );
@@ -83,10 +83,10 @@ classdef SingleScanOutput < handle
     
     function queue_value(obj, channel, value)
       
-      %   QUEUE_VALUE -- Set a channel's value to be written this frame.
+      %   QUEUE_VALUE -- Set a value to be written this frame.
       %
       %     queue_value( obj, channel, value ); sets the entry of 
-      %     PersistOutputValues corresponding to `channel` to `value`, but
+      %     PendingOutputValues corresponding to `channel` to `value`, but
       %     does not write the value to the output.
       %
       %     See also ptb.signal.SingleScanOutput,

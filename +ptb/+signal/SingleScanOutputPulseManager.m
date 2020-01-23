@@ -29,14 +29,18 @@ classdef SingleScanOutputPulseManager < handle
       
       %   SINGLESCANOUTPUTPULSEMANAGER -- Create pulse manager instance.
       %
-      %     obj = ptb.signal.SingleScanOutputPulseManager( single_scan_output, channel_index );
+      %     obj = ptb.signal.SingleScanOutputPulseManager( 
+      %       single_scan_output, channel_index 
+      %     );
       %     instantiates an interface for writing timed pulses to a DAQ
       %     session output. `single_scan_output` is a
       %     ptb.signal.SingleScanOutput object representing the set of
       %     single scan output channels in the current DAQ session, and
       %     `channel_index` is the 1-based index into that channel set.
       %
-      %     See also ptb.signal.trigger, ptb.signal.update
+      %     See also ptb.signal.SingleScanOutputPulseManager.trigger,
+      %       ptb.signal.SingleScanOutputPulseManager.update,
+      %       ptb.signal.SingleScanOutput
       
       validateattributes( scan_output, {'ptb.signal.SingleScanOutput'} ...
         , {'scalar'}, mfilename, 'scan_output' );
@@ -63,8 +67,8 @@ classdef SingleScanOutputPulseManager < handle
       %
       %     update( obj ); considers pending and active pulses. If the 
       %     active pulse has elapsed, it is terminated by writing Low to 
-      %     the output. If a pending pulse exists, it is made active and 
-      %     removed from the queue.
+      %     the output. If a pending pulse exists, it is made active by
+      %     writing High to the output and removed from the queue.
       %
       %     See also ptb.signal.SingleScanOutputPulseManager
       
@@ -98,8 +102,8 @@ classdef SingleScanOutputPulseManager < handle
       %     `update`, the pulse will be triggered once all pending pulses
       %     have been triggered.
       %
-      %     See also ptb.SingleScanOutputPulseManager,
-      %       ptb.SingleScanOutputPulseManager.update
+      %     See also ptb.signal.SingleScanOutputPulseManager,
+      %       ptb.signal.SingleScanOutputPulseManager.update
       
       if ( isempty(obj.pending_pulse_times) && elapsed_active(obj) )        
         write_high_activate( obj, pulse_time );
