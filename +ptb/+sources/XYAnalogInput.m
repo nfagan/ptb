@@ -26,6 +26,9 @@ classdef XYAnalogInput < ptb.XYSource
     %
     %     See also ptb.sources.XYAnalogInput
     OutputVoltageRange = [-5, 5];
+    
+    %   CALIBRATIONRECTPADDINGFRACT -- 
+    CalibrationRectPaddingFract = [0, 0];
   end
   
   methods
@@ -103,14 +106,37 @@ classdef XYAnalogInput < ptb.XYSource
       
       compute_intervals( obj );
     end
+    
+    function set.CalibrationRectPaddingFract(obj, v)
+      validateattributes( v, {'double'}, {'numel', 2, 'finite', 'nonnan'} ...
+        , mfilename, 'CalibrationRectPaddingFract' );
+      obj.CalibrationRectPaddingFract = v(:)';
+      compute_intervals( obj );
+    end
   end
   
   methods (Access = private)
     function compute_intervals(obj)
       import ptb.util.LinearlyMappedInterval;
       
-      x_range = [ obj.CalibrationRect.X1, obj.CalibrationRect.X2 ];
-      y_range = [ obj.CalibrationRect.Y1, obj.CalibrationRect.Y2 ];
+      base_rect = obj.CalibrationRect;
+      % r = [x1, y1, x2, y2];
+      x1 = base_rect.X1;
+      x2 = base_rect.X2;
+      y1 = base_rect.Y1;
+      y2 = base_rect.Y2;
+      
+      w = x2 - x1;
+      h = y2 - y1;
+      
+      expand_lb_x = w * obj.CalibrationRectPaddingFract(1) / 2;
+      expand_ub_x = w * obj.CalibrationRectPaddingFract(2) / 2;
+      
+      expand_lb_y = h * obj.CalibrationRectPaddingFract(1);
+      expand_ub_y = h * obj.CalibrationRectPaddingFract(2);
+      
+      x_range = [x1 - expand_lb_x, x2 + expand_ub_x];
+      y_range = [y1 - expand_lb_y, y2 + expand_ub_y];
       
       obj.x_interval = LinearlyMappedInterval( obj.OutputVoltageRange, x_range );
       obj.y_interval = LinearlyMappedInterval( obj.OutputVoltageRange, y_range );
