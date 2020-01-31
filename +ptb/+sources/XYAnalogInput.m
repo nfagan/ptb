@@ -129,8 +129,8 @@ classdef XYAnalogInput < ptb.XYSource
       w = x2 - x1;
       h = y2 - y1;
       
-      expand_lb_x = w * obj.CalibrationRectPaddingFract(1) / 2;
-      expand_ub_x = w * obj.CalibrationRectPaddingFract(2) / 2;
+      expand_lb_x = w * obj.CalibrationRectPaddingFract(1);
+      expand_ub_x = w * obj.CalibrationRectPaddingFract(2);
       
       expand_lb_y = h * obj.CalibrationRectPaddingFract(1);
       expand_ub_y = h * obj.CalibrationRectPaddingFract(2);
