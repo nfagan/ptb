@@ -27,14 +27,25 @@ classdef XYAnalogInput < ptb.XYSource
     %     See also ptb.sources.XYAnalogInput
     OutputVoltageRange = [-5, 5];
     
-    %   CALIBRATIONRECTPADDINGFRACT -- 
+    %   CALIBRATIONRECTPADDINGFRACT -- Fraction by which rect is padded.
+    %
+    %     CalibrationRectPaddingFract is a 2-element vector giving the
+    %     proportions of the width and height of the CalibrationRect by
+    %     which it is implicitly expanded. For example, if CalibrationRect
+    %     is [0, 0, 1000, 1000], OutputVoltageRange is [-5, 5], and
+    %     CalibrationRectPaddingFract is [0.1, 0.1], then an (X, Y) input
+    %     voltage of (-5, -5) corresponds to the pixel-position 
+    %     (-100, -100). Default is [0, 0], in which no padding is applied.
+    %
+    %     See also ptb.sources.XYAnalogInput,
+    %       ptb.sources.XYAnalogInput.CalibrationRect
     CalibrationRectPaddingFract = [0, 0];
   end
   
   methods
     function obj = XYAnalogInput(source, calibration_rect, channel_mapping)
       
-      %   XYANALOGOUTPUT -- Create XY analog source object instance.
+      %   XYANALOGINPUT -- Create XY analog source object instance.
       %
       %     obj = ptb.sources.XYAnalogInput( source ); creates an
       %     interface for obtaining (X, Y) gaze position samples from the
