@@ -1,3 +1,5 @@
+% See also ptb.bounds.Always.Always
+% @T import ptb.types
 classdef Always < ptb.XYBounds
   
   methods
@@ -10,11 +12,13 @@ classdef Always < ptb.XYBounds
       %
       %     See also ptb.XYBounds, ptb.XYBounds.test
       
+      % @T cast ptb.bounds.Always
       obj = obj@ptb.XYBounds();
     end
   end
   
   methods (Access = public)
+    % @T :: [logical] = (ptb.bounds.Always, double, double)
     function tf = test(obj, x, y)
       tf = true;
     end

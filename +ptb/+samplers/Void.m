@@ -1,6 +1,9 @@
+% See also ptb.samplers.Void.Void
+% @T import ptb.XYSource
 classdef Void < ptb.XYSampler
   
   methods
+    % @T :: [?] = (ptb.XYSource)
     function obj = Void(varargin)
       
       %   VOID -- Never update coordinates from Source.
@@ -11,6 +14,7 @@ classdef Void < ptb.XYSampler
       %
       %     See also ptb.XYSampler, ptb.XYSource, ptb.samplers.Missing
       
+      % @T cast ptb.samplers.Void
       obj = obj@ptb.XYSampler( varargin{:} );
     end
   end

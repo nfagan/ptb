@@ -1,12 +1,16 @@
+% See also ptb.bounds.CirclePrimitive/CirclePrimitive
+% @T import ptb.types
 classdef CirclePrimitive < ptb.XYBounds
   
   methods
     function obj = CirclePrimitive()
+      % @T cast ptb.bounds.CirclePrimitive
       obj = obj@ptb.XYBounds();
     end
   end
   
   methods (Access = public)
+    % @T :: [logical] = (ptb.bounds.CirclePrimitive, double, double)
     function tf = test(obj, x, y)
       
       %   TEST -- Test if (X, Y) coordinate is in bounds of circle.
@@ -25,6 +29,7 @@ classdef CirclePrimitive < ptb.XYBounds
       tf = ptb.util.distance( x, y, x2, y2 ) < radius;
     end
     
+    % @T :: [] = (ptb.bounds.CirclePrimitive, ptb.Window, double)
     function draw(obj, window, color)
       
       %   DRAW -- Draw outline of circle bounds.
@@ -56,8 +61,11 @@ classdef CirclePrimitive < ptb.XYBounds
   end
   
   methods (Access = protected, Abstract = true)
-    get_center(obj);
-    get_radius(obj);
+    % @T :: [double] = (ptb.bounds.CirclePrimitive)
+    out = get_center(obj);
+    
+    % @T :: [double] = (ptb.bounds.CirclePrimitive)
+    out = get_radius(obj);
   end
   
   methods (Access = protected)

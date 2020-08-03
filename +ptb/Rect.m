@@ -1,3 +1,5 @@
+% See also ptb.Rect/Rect
+% @T import ptb.types
 classdef Rect < ptb.RectPrimitive
   
   properties (Access = public)
@@ -117,6 +119,7 @@ classdef Rect < ptb.RectPrimitive
       end
     end
     
+    % @T :: [ptb.Rect] = (ptb.Rect, double)
     function obj = set.X1(obj, v)
       try
         obj.X1 = validate_component( obj, v, 'X1', 'X2', true );
@@ -125,6 +128,7 @@ classdef Rect < ptb.RectPrimitive
       end
     end
     
+    % @T :: [ptb.Rect] = (ptb.Rect, double)
     function obj = set.X2(obj, v)
       try
         obj.X2 = validate_component( obj, v, 'X2', 'X1', false );
@@ -133,6 +137,7 @@ classdef Rect < ptb.RectPrimitive
       end
     end
     
+    % @T :: [ptb.Rect] = (ptb.Rect, double)
     function obj = set.Y1(obj, v)
       try
         obj.Y1 = validate_component( obj, v, 'Y1', 'Y2', true );
@@ -141,6 +146,7 @@ classdef Rect < ptb.RectPrimitive
       end
     end
     
+    % @T :: [ptb.Rect] = (ptb.Rect, double)
     function obj = set.Y2(obj, v)
       try
         obj.Y2 = validate_component( obj, v, 'Y2', 'Y1', false );
@@ -161,6 +167,7 @@ classdef Rect < ptb.RectPrimitive
       obj(1:numel(obj)) = [];
     end
     
+    % @T :: [logical] = (ptb.Rect, ptb.Rect)
     function tf = eq(obj, B)
       
       %   EQ -- True if operands are equal-valued ptb.Rect objects.
@@ -181,6 +188,7 @@ classdef Rect < ptb.RectPrimitive
         isequaln( obj.Y1, B.Y1 ) && isequaln( obj.Y2, B.Y2 );      
     end
     
+    % @T :: [logical] = (ptb.Rect, ptb.Rect)
     function tf = ne(obj, B)
       
       %   EQ -- True if operands are not equal-valued ptb.Rect objects.
@@ -194,6 +202,7 @@ classdef Rect < ptb.RectPrimitive
       tf = ~eq( obj, B );
     end
     
+    % @T :: [logical, char] = (ptb.Rect, ptb.Rect)
     function [tf, reason] = is_settable_from(obj, r)
       
       %   IS_SETTABLE_FROM -- True if A's contents can be set from B.
@@ -257,6 +266,7 @@ classdef Rect < ptb.RectPrimitive
       tf = true;
     end
     
+    % @T :: [double] = (ptb.Rect)
     function r = get(obj)
       
       %   GET -- Obtain contents in vector form.
@@ -269,6 +279,7 @@ classdef Rect < ptb.RectPrimitive
       r = [ obj.X1, obj.Y1, obj.X2, obj.Y2 ];
     end
     
+    % @T :: [ptb.Rect] = (ptb.Rect, double, double)
     function obj = set_extents(obj, x, y)
       
       %   SET_EXTENTS -- Set X and Y extents, simultaneously.
@@ -287,6 +298,7 @@ classdef Rect < ptb.RectPrimitive
       end
     end
     
+    % @T :: [ptb.Rect] = (ptb.Rect, double, list<double>)
     function obj = set_x_extent(obj, extent, varargin)
       
       %   SET_X_EXTENT -- Set maximum X to extend from minimum X.
@@ -308,6 +320,7 @@ classdef Rect < ptb.RectPrimitive
       end
     end
     
+    % @T :: [ptb.Rect] = (ptb.Rect, double, list<double>)
     function obj = set_y_extent(obj, extent, varargin)
       
       %   SET_Y_EXTENT -- Set maximum Y to extend from minimum Y.
@@ -361,7 +374,8 @@ classdef Rect < ptb.RectPrimitive
       y = get_y_extent( obj );
     end
     
-    function obj = set(obj, rect)
+    % @T :: [ptb.Rect] = (ptb.Rect, ptb.Rect | double)
+    function obj = set(obj, r)
       
       %   SET -- Set Rect contents.
       %
@@ -375,9 +389,14 @@ classdef Rect < ptb.RectPrimitive
       %
       %     See also ptb.Rect, ptb.Rect.get, ptb.Rect.is_settable_from
       
-      if ( isa(rect, 'ptb.Rect') && isa(obj, 'ptb.Rect') )
+      if ( isa(r, 'ptb.Rect') && isa(obj, 'ptb.Rect') )
         try
-          obj = set_from_rect_object( obj, rect );
+          % @T cast ptb.Rect
+          o = obj;
+          % @T cast ptb.Rect
+          rr = r;
+          
+          obj = set_from_rect_object( o, rr );
         catch err
           throw( err );
         end
@@ -387,6 +406,9 @@ classdef Rect < ptb.RectPrimitive
       if ( isempty(obj) )
         return
       end
+      
+      % @T cast double
+      rect = r;
       
       classes = { 'numeric' };
       attrs = { 'numel', 4 };
@@ -467,6 +489,7 @@ classdef Rect < ptb.RectPrimitive
       obj.(prop2) = obj.(prop1) + extent;
     end
     
+    % @T :: [ptb.Rect] = (ptb.Rect, ptb.Rect)
     function obj = set_from_rect_object(obj, r)
       
       if ( isempty(r) )
@@ -533,6 +556,7 @@ classdef Rect < ptb.RectPrimitive
   end
   
   methods (Access = private, Static = true)
+    % @T :: [logical] = (double)
     function tf = all_is_integer(r)
       
       %   ALL_IS_INTEGER -- True if all elements of an array are

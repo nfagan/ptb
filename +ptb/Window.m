@@ -1,3 +1,5 @@
+% See also ptb.Window/Window
+% @T import ptb.types
 classdef Window < handle  
   properties (Access = public)
     %   INDEX -- Index of the monitor on which to open the Window.
@@ -108,6 +110,7 @@ classdef Window < handle
   end
   
   methods
+    % @T :: [ptb.Window] = (ptb.Rect)
     function obj = Window(rect)
       
       %   WINDOW -- Create Window object instance.
@@ -137,6 +140,7 @@ classdef Window < handle
       end
     end
     
+    % @T :: [] = (ptb.Window, double)
     function set.Index(obj, index)
       try
         set_error_if_open( obj, 'Index' );
@@ -161,11 +165,13 @@ classdef Window < handle
       obj.Index = double( index );
     end
     
+    % @T :: [] = (ptb.Window, logical)
     function set.SkipSyncTests(obj, tf)
       validateattributes( tf, {'logical'}, {'scalar'}, mfilename, 'SkipSyncTests' );
       obj.SkipSyncTests = tf;      
     end
     
+    % @T :: [] = (ptb.Window, double)
     function set.PhysicalDimensions(obj, dims)
       prop = 'PhysicalDimensions';
       
@@ -182,6 +188,7 @@ classdef Window < handle
       obj.PhysicalDimensions = double( dims(:)' );
     end
     
+    % @T :: [] = (ptb.Window, double)
     function set.ViewDistance(obj, to)
       validateattributes( to, {'numeric'}, {'numel', 1, 'nonnegative'} ...
         , mfilename, 'view distance' ...
@@ -190,6 +197,7 @@ classdef Window < handle
       obj.ViewDistance = to;
     end
     
+    % @T :: [] = (ptb.Window, double | ptb.Rect)
     function set.Rect(obj, rect)
       try
         set_error_if_open( obj, 'Rect' );
@@ -280,6 +288,7 @@ classdef Window < handle
       r = get( obj.Rect );
     end
     
+    % @T :: [] = (ptb.Window, double)
     function set_width(obj, w)
       
       %   SET_WIDTH -- Set window width.
@@ -307,6 +316,7 @@ classdef Window < handle
       obj.Rect = set_x_extent( rect, w );
     end
     
+    % @T :: [] = (ptb.Window, double)
     function set_height(obj, h)
       
       %   SET_WIDTH -- Set window height.
@@ -334,6 +344,7 @@ classdef Window < handle
       obj.Rect = set_y_extent( rect, h );
     end
     
+    % @T :: [] = (ptb.Window, double, double)
     function set_dimensions(obj, w, h)
       
       %   SET_DIMENSIONS -- Set width and height, at once.
@@ -418,12 +429,13 @@ classdef Window < handle
       try
         [handle, rect] = Screen( 'OpenWindow', obj.Index, obj.BackgroundColor, rect );
       catch err
-        conditional_unset_skip_sync_test();
+        conditional_unset_skip_sync_test( true );
         
         throw( err );        
       end
       
       obj.WindowHandle = handle;
+      % @T presume ptb.Rect
       obj.Rect = rect;
       
       obj.IsOpen = true;
@@ -487,6 +499,7 @@ classdef Window < handle
       end
     end
     
+    % @T :: [ptb.Rect] = (ptb.Window)
     function dflt = get_default_rect(obj)
       dflt = ptb.Rect( [] ...
         , 'IsNonNan',       true ...
@@ -528,14 +541,18 @@ classdef Window < handle
   end
   
   methods (Access = public, Static = true)
+    % @T :: [logical] = (ptb.MaybeWindow)
     function tf = is_valid_window(win)
       
       %   IS_VALID_WINDOW -- True if input is an open ptb.Window object.
       %
       %     See also ptb.VisualStimulus
       
-      tf = isa( win, 'ptb.Window' ) && ...
-        win.IsOpen && ~isnan( win.WindowHandle );
+      if ( isa(win, 'ptb.Window') )
+        tf = win.IsOpen && ~isnan( win.WindowHandle );
+      else
+        tf = false;
+      end
     end
   end
 end

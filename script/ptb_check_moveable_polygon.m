@@ -4,7 +4,7 @@ import ptb.keys.*;
 
 cleanup = onCleanup( @() ListenChar(0) );
 
-window = ptb.Window( [] );
+window = ptb.Window();
 open( window );
 
 p = ptb.stimuli.Polygon( window );

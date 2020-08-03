@@ -1,3 +1,4 @@
+% @T import ptb.types
 classdef Clock < handle
   
   properties (Access = private)

@@ -1,3 +1,6 @@
+% See also ptb.XYTarget/XYTarget
+% @T import ptb.XYSampler
+% @T import ptb.XYBounds
 classdef XYTarget < handle
   
   properties (Access = public)
@@ -10,6 +13,8 @@ classdef XYTarget < handle
     %     modifying them.
     %
     %     See also ptb.XYSampler, ptb.samplers.Pass, ptb.samplers.Missing
+    %
+    %     @T :: ptb.XYSampler
     Sampler = ptb.samplers.Void();
     
     %   BOUNDS -- Object defining target boundaries.
@@ -33,6 +38,8 @@ classdef XYTarget < handle
     %
     %     See also ptb.XYBounds, ptb.XYTarget, ptb.XYTarget.Source, 
     %       ptb.bounds.Always, ptb.bounds.Never, ptb.XYTarget.IsInBounds
+    %
+    %     @T :: ptb.XYBounds
     Bounds = ptb.bounds.Never();
     
     %   DURATION -- Amount of cumulative time to be spent in bounds.
@@ -42,6 +49,8 @@ classdef XYTarget < handle
     %     IsDurationMet property is set to true. Default is Inf.
     %
     %     See also ptb.XYTarget, ptb.XYTarget.IsDurationMet
+    %
+    %     @T :: double
     Duration = inf;
     
     %   ENTRY -- Entry function.
@@ -51,6 +60,8 @@ classdef XYTarget < handle
     %     -- the target object instance -- and return no outputs.
     %
     %     See also ptb.XYTarget, ptb.XYTarget.Exit, ptb.XYTarget.Bounds
+    %
+    %     @T :: [?] = (?)
     Entry = @(varargin) 1;
     
     %   EXIT -- Exit function.
@@ -60,6 +71,8 @@ classdef XYTarget < handle
     %     -- the target object instance -- and return no outputs.
     %
     %     See also ptb.XYTarget, ptb.XYTarget.Exit, ptb.XYTarget.Bounds
+    %
+    %     @T :: [?] = (?)
     Exit = @(varargin) 1;
   end
   
@@ -70,6 +83,8 @@ classdef XYTarget < handle
     %     most recent (X, Y) coordinate was considered in bounds.
     %
     %     See also ptb.XYTarget, ptb.XYTarget.Bounds
+    %
+    %     @T :: logical
     IsInBounds = false;
     
     %   ISDURATIONMET -- True if Cumulative is greater than Duration.
@@ -80,6 +95,8 @@ classdef XYTarget < handle
     %
     %     See also ptb.XYTarget, ptb.XYTarget.Duration,
     %       ptb.XYTarget.Cumulative
+    %
+    %     @T :: logical
     IsDurationMet = false;
     
     %   CUMULATIVE -- Total amount of consecutive time spent in bounds.
@@ -90,13 +107,17 @@ classdef XYTarget < handle
     %     or after a call to the `reset` function.
     %
     %     See also ptb.XYTarget, ptb.XYTarget.reset
+    %
+    %     @T :: double
     Cumulative = 0;
   end
   
   properties (Access = private)
+    % @T :: double
     last_frame = nan;
+    % @T :: double
     cumulative_timer;
-    
+    % @T :: logical
     did_enter = false;
   end
   
@@ -132,16 +153,19 @@ classdef XYTarget < handle
       obj.cumulative_timer = tic;
     end
     
+    % @T :: [] = (ptb.XYTarget, ptb.XYBounds)
     function set.Bounds(obj, v)
       validateattributes( v, {'ptb.XYBounds'}, {'scalar'}, mfilename, 'Bounds' );
       obj.Bounds = v;
     end
     
+    % @T :: [] = (ptb.XYTarget, ptb.XYSampler)
     function set.Sampler(obj, v)
       validateattributes( v, {'ptb.XYSampler'}, {'scalar'}, mfilename, 'Source' );
       obj.Sampler = v;
     end
     
+    % @T :: [] = (ptb.XYTarget, double)
     function set.Duration(obj, v)
       validateattributes( v, {'numeric'}, {'scalar', 'nonnegative'} ...
         , mfilename, 'Duration' );

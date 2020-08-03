@@ -7,6 +7,8 @@ classdef XYSource < handle
     %     coordinate.
     %
     %     See also ptb.XYSource, ptb.XYSource.Y
+    %
+    %     @T :: double
     X = nan;
     
     %   Y -- Latest Y coordinate.
@@ -15,6 +17,8 @@ classdef XYSource < handle
     %     coordinate.
     %
     %     See also ptb.XYSource, ptb.XYSource.X, ptb.XYSource.IsNewSample
+    %
+    %     @T :: double
     Y = nan;
     
     %   ISNEWSAMPLE -- True if (X, Y) coordinates were updated.
@@ -25,6 +29,8 @@ classdef XYSource < handle
     %
     %     See also ptb.XYSource, ptb.XYSource.IsValidSample, 
     %       ptb.XYSource.update
+    %
+    %     @T :: logical
     IsNewSample = false;
     
     %   ISVALIDSAMPLE -- True if current (X, Y) coordinates are valid.
@@ -36,6 +42,8 @@ classdef XYSource < handle
     %     not nan.
     %
     %     See also ptb.XYSource, ptb.XYSource.IsNewSample, ptb.XYSource.update
+    %
+    %     @T :: logical
     IsValidSample = false;
   end
   
@@ -86,8 +94,11 @@ classdef XYSource < handle
   end
   
   methods (Abstract, Access = protected)
-    new_sample_available(obj);
-    get_latest_sample(obj);
+    % @T :: [logical] = (ptb.XYSource)
+    [tf] = new_sample_available(obj);
+    
+    % @T :: [double, double, logical] = (ptb.XYSource)
+    [x, y, success] = get_latest_sample(obj);
   end
   
 end

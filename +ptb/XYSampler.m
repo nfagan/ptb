@@ -1,3 +1,6 @@
+% See also ptb.XYSampler.XYSampler
+% @T import ptb.XYSource
+% @T import ptb.types
 classdef XYSampler < handle
   
   properties (Access = public)
@@ -8,6 +11,8 @@ classdef XYSampler < handle
     %     It is the object from which (X, Y) coordinates are drawn.
     %
     %     See also ptb.XYSampler, ptb.XYSource
+    %
+    %     @T :: ptb.Null | ptb.XYSource
     Source = ptb.Null();
   end
   
@@ -16,12 +21,16 @@ classdef XYSampler < handle
     %
     %     See also ptb.XYSampler, ptb.XYSampler.Y,
     %       ptb.XYSampler.IsValidSample
+    %
+    %     @T :: double
     X = nan;
     
     %   Y -- Latest sampled Y-coordinate.
     %
     %     See also ptb.XYSampler, ptb.XYSampler.X,
     %       ptb.XYSampler.IsValidSample
+    %
+    %     @T :: double
     Y = nan;
     
     %   ISVALIDSAMPLE -- True if the latest sample is valid.
@@ -32,10 +41,13 @@ classdef XYSampler < handle
     %     ready-to-use by the consumer of those coordinates.
     %
     %     See also ptb.XYSampler, ptb.XYSampler.X
+    %
+    %     @T :: logical
     IsValidSample = false;
   end
   
   methods
+    % @T :: [ptb.XYSampler] = (ptb.XYSource | ptb.Null)
     function obj = XYSampler(source)
       
       %   XYSAMPLER -- Abstract superclass for gaze position samplers.
@@ -61,6 +73,7 @@ classdef XYSampler < handle
       obj.Source = source;
     end
     
+    % @T :: [] = (ptb.XYSampler, ptb.XYSource | ptb.Null)
     function set.Source(obj, source)
       try
         source = validate_source( obj, source );
@@ -76,10 +89,12 @@ classdef XYSampler < handle
   
   methods (Access = protected)
     
+    % @T :: [] = (ptb.XYSampler, ptb.XYSource | ptb.Null)
     function on_set_source(obj, source)
       % 
     end
     
+    % @T :: [ptb.XYSource | ptb.Null] = (ptb.XYSampler, ptb.XYSource | ptb.Null)
     function source = validate_source(obj, source)
       validateattributes( source, {'ptb.XYSource', 'ptb.Null'} ...
         , {'scalar'}, mfilename, 'Source' );

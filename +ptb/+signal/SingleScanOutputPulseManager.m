@@ -1,11 +1,15 @@
+% See also ptb.signal.SingleScanOutputPulseManager/SingleScanOutputPulseManager
+% @T import ptb.types
 classdef SingleScanOutputPulseManager < handle
   properties (Access = private)
     scan_output;
+    % @T :: double
     channel_index;
     
     active_pulse_timer;
     active_pulse_time;
     
+    % @T :: double
     pending_pulse_times;
   end
   
@@ -51,11 +55,13 @@ classdef SingleScanOutputPulseManager < handle
       obj.channel_index = channel_index;
     end
     
+    % @T :: [] = (?, double)
     function set.Low(obj, v)
       validate_voltage( obj, v, 'Low' );
       obj.Low = v;
     end
     
+    % @T :: [] = (?, double)
     function set.High(obj, v)
       validate_voltage( obj, v, 'High' );
       obj.High = v;
@@ -88,6 +94,7 @@ classdef SingleScanOutputPulseManager < handle
       obj.pending_pulse_times(1) = [];
     end
     
+    % @T :: [] = (?, double)
     function trigger(obj, pulse_time)
       
       %   TRIGGER -- Trigger pulse, or queue it if an active pulse exists.

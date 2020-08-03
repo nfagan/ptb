@@ -41,6 +41,7 @@ classdef MatchPolygon < ptb.bounds.PolygonPrimitive
       obj.Polygon = p;      
     end
     
+    % @T :: [double] = (ptb.bounds.MatchPolygon)
     function verts = get_vertices(obj)
       if ( ptb.isnull(obj.Polygon) )
         verts = [];

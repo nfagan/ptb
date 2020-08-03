@@ -1,3 +1,5 @@
+% See also ptb.sources.Eyelink.Eyelink
+% @T import ptb.types
 classdef Eyelink < ptb.XYSource
   
   properties (Access = private, Constant = true)
@@ -8,6 +10,7 @@ classdef Eyelink < ptb.XYSource
   end
   
   properties (Access = private)
+    % @T :: ptb.EyelinkInitDefaults
     eyelink_defaults;
     tracked_eye_index = -1;
     
@@ -77,6 +80,7 @@ classdef Eyelink < ptb.XYSource
       %       ptb.sources.Eyelink.update, ptb.sources.Eyelink.start_recording,
       %       ptb.sources.Mouse
       
+      % @T cast ptb.sources.Eyelink
       obj = obj@ptb.XYSource();
       obj.eyelink_defaults = EyelinkInitDefaults();
     end
@@ -117,6 +121,7 @@ classdef Eyelink < ptb.XYSource
   end
   
   methods (Access = public)
+    % @T :: [] = (ptb.sources.Eyelink, char)
     function start_recording(obj, file_name)
       
       %   START_RECORDING -- Begin recording samples.
@@ -145,6 +150,7 @@ classdef Eyelink < ptb.XYSource
         WaitSecs( 0.5 ); % Give eyelink time to open the file.
       end
       
+      % @T cast double
       status = Eyelink( 'StartRecording' );
       
       if ( status ~= 0 )
@@ -214,6 +220,7 @@ classdef Eyelink < ptb.XYSource
         throw( err );
       end
       
+      % @T cast double
       status = Eyelink( 'ReceiveFile', obj.file_name, dest, 1 );
       
       if ( status < 0 )
@@ -224,6 +231,7 @@ classdef Eyelink < ptb.XYSource
       obj.ReceivedFile = true;
     end
     
+    % @T :: [] = (ptb.sources.Eyelink, char)
     function conditional_receive_file(obj, dest)
       
       %   CONDITIONAL_RECEIVE_FILE -- Receive file if not already received.
@@ -249,9 +257,11 @@ classdef Eyelink < ptb.XYSource
       %
       %     See also ptb.sources.Eyelink
       
+      % @T cast double
       connection_status = Eyelink( 'IsConnected' );
       
       if ( connection_status == 0 )
+        % @T cast double
         status = Eyelink( 'Initialize' );
       else
         status = 0;
@@ -271,6 +281,7 @@ classdef Eyelink < ptb.XYSource
       obj.IsInitialized = true;
     end
     
+    % @T :: [] = (ptb.sources.Eyelink, char)
     function send_message(obj, message)
       
       %   SEND_MESSAGE -- Send message to Eyelink.
@@ -290,6 +301,7 @@ classdef Eyelink < ptb.XYSource
           , 'Cannot send "%s", because Eyelink is not initialized.', message );
       end
       
+      % @T cast double
       status = Eyelink( 'Message', message );
       
       if ( status ~= 0 )
@@ -304,6 +316,7 @@ classdef Eyelink < ptb.XYSource
       file_name = ptb.sources.Eyelink.validate_scalar_text( file_name, 'filename' );
       file_name = char( file_name );
 
+      % @T cast double
       status = Eyelink( 'OpenFile', file_name );
 
       if ( status ~= 0 )
@@ -315,6 +328,7 @@ classdef Eyelink < ptb.XYSource
     end
     
     function try_close_file(obj)
+      % @T cast double
       status = Eyelink( 'CloseFile' );
 
       if ( status ~= 0 )
@@ -326,6 +340,7 @@ classdef Eyelink < ptb.XYSource
     end
     
     function link_gaze_data(obj)
+      % @T cast double
       status = Eyelink( 'command', 'link_event_data = GAZE,GAZERES,HREF,AREA,VELOCITY' );
       
       if ( status ~= 0 )
@@ -333,6 +348,7 @@ classdef Eyelink < ptb.XYSource
           , 'Failed to link gaze event data.' );
       end
       
+      % @T cast double
       status = Eyelink( 'command', 'link_event_filter = LEFT,RIGHT,FIXATION,BLINK,SACCADE,BUTTON' );
       
       if ( status ~= 0 )
@@ -348,6 +364,7 @@ classdef Eyelink < ptb.XYSource
         return
       end
       
+      % @T cast double
       tracked_eye = Eyelink( 'EyeAvailable' );
       obj.tracked_eye_index = tracked_eye;
     end
@@ -378,18 +395,21 @@ classdef Eyelink < ptb.XYSource
         return
       end
       
-      x = event.gx(tracked_eye+1);
-      y = event.gy(tracked_eye+1);
+      % @T cast ptb.EyelinkNewestFloatSample
+      evt = event;
+      x = evt.gx(tracked_eye+1);
+      y = evt.gy(tracked_eye+1);
 
       md = obj.eyelink_defaults.MISSING_DATA;
         
       % If either X or Y is missing or NaN, indicate failure
-      success = x ~= md && y ~= md && event.pa(tracked_eye+1) > 0 && ...
+      success = x ~= md && y ~= md && evt.pa(tracked_eye+1) > 0 && ...
         ~isnan( x ) && ~isnan( y );
     end
   end
   
   methods (Access = private, Static = true)
+    % @T :: [char] = (char, char)
     function text = validate_scalar_text(text, var_name)
       classes = { 'char', 'string' };
       attrs = { 'scalartext', 'nonempty' };

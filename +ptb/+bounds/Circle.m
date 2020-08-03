@@ -1,3 +1,5 @@
+% See also ptb.bounds.Circle/Circle
+% @T import ptb.types
 classdef Circle < ptb.bounds.CirclePrimitive
   
   properties (Access = public)
@@ -11,6 +13,8 @@ classdef Circle < ptb.bounds.CirclePrimitive
     %     Window can also be a ptb.Null object, representing the absence of
     %     a window. In this case, if the units of Center or Radius are not
     %     'px', then their values are NaN.
+    %
+    %     @T :: ptb.Null | ptb.Window
     Window = ptb.Null;
     
     %   CENTER -- (X, Y) center of the bounding circle.
@@ -24,6 +28,8 @@ classdef Circle < ptb.bounds.CirclePrimitive
     %
     %     See also ptb.bounds.Circle, ptb.bounds.Circle.Window, 
     %       ptb.WindowDependent, ptb.bounds.Circle.Radius
+    %
+    %     @T :: ptb.WindowDependent
     Center = ptb.WindowDependent( nan );
     
     %   RADIUS -- Radius of the bounding circle.
@@ -37,6 +43,8 @@ classdef Circle < ptb.bounds.CirclePrimitive
     %
     %     See also ptb.bounds.Circle, ptb.bounds.Circle.Window, 
     %       ptb.WindowDependent
+    %
+    %     @T :: ptb.WindowDependent
     Radius = ptb.WindowDependent.Configured( 'NDimensions', 1, 'IsNonNegative', true );
   end
   
@@ -55,17 +63,21 @@ classdef Circle < ptb.bounds.CirclePrimitive
       %     See also ptb.bounds.Circle.Center, ptb.bounds.Circle.Radius,
       %     ptb.bounds.Circle.Window, ptb.XYBounds
       
+      % @T cast ptb.bounds.Circle
       obj = obj@ptb.bounds.CirclePrimitive();
     end
     
+    % @T :: [] = (ptb.bounds.Circle, double | ptb.WindowDependent)
     function set.Center(obj, v)
       obj.Center = set( obj.Center, v );
     end
     
+    % @T :: [] = (ptb.bounds.Circle, double | ptb.WindowDependent)
     function set.Radius(obj, v)
       obj.Radius = set( obj.Radius, v );
     end
     
+    % @T :: [] = (ptb.bounds.Circle, ptb.Window | ptb.Null)
     function set.Window(obj, v)
       validateattributes( v, {'ptb.Window', 'ptb.Null'} ...
         , {'scalar'}, mfilename, 'Window' );
@@ -74,10 +86,12 @@ classdef Circle < ptb.bounds.CirclePrimitive
   end
   
   methods (Access = protected)
+    % @T :: [double] = (ptb.bounds.Circle)
     function center = get_center(obj)
       center = as_px( obj.Center, obj.Window );
     end
     
+    % @T :: [double] = (ptb.bounds.Circle)
     function radius = get_radius(obj)
       radius = as_px( obj.Radius, obj.Window );
     end

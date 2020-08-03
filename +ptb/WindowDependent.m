@@ -1,3 +1,6 @@
+% See also ptb.WindowDependent/WindowDependent
+% % @T import ptb.Window
+% @T import ptb.types
 classdef WindowDependent
   
   properties (Access = public)
@@ -8,6 +11,8 @@ classdef WindowDependent
     %
     %     See also ptb.WindowDependent, ptb.WindowDependent.Units,
     %       ptb.WindowDependent.NDimensions
+    %
+    %     @T :: double
     Value;
     
     %   UNITS -- Units of the WindowDependent object's Value.
@@ -36,6 +41,8 @@ classdef WindowDependent
     %
     %     See also ptb.WindowDependent, ptb.WindowDependent.as_px,
     %       ptb.Window.PhysicalDimensions, ptb.Window.ViewDistance
+    %
+    %     @T :: char
     Units = 'px';
   end
   
@@ -50,6 +57,8 @@ classdef WindowDependent
     %     dimensions, and thus the number of components, of Value.
     %
     %     See also ptb.WindowDependent, ptb.WindowDependent.Value
+    %
+    %     @T :: double
     NDimensions = 2;
     
     %   ISNONNEGATIVE -- True if components must be non-negative.
@@ -60,6 +69,8 @@ classdef WindowDependent
     %     produce an error.
     %
     %     See also ptb.WindowDependent, ptb.WindowDependent.Configured
+    %
+    %     @T :: logical
     IsNonNegative = false;
   end
   
@@ -104,14 +115,17 @@ classdef WindowDependent
       end
     end
     
+    % @T :: [ptb.WindowDependent] = (ptb.WindowDependent, char)
     function obj = set.Units(obj, units)
       obj.Units = validatestring( units, obj.UnitKinds, mfilename, 'Units' );
     end
     
+    % @T :: [ptb.WindowDependent] = (ptb.WindowDependent, double)
     function obj = set.Value(obj, value)
       obj.Value = check_value( obj, value );
     end
     
+    % @T :: [ptb.WindowDependent] = (ptb.WindowDependent, double)
     function obj = set.NDimensions(obj, value)
       validateattributes( value, {'numeric'}, {'scalar', 'positive'} ...
         , mfilename, 'NDimensions' );      
@@ -120,6 +134,7 @@ classdef WindowDependent
   end
   
   methods (Access = public)    
+    % @T :: [ptb.WindowDependent] = (ptb.WindowDependent, double | ptb.WindowDependent)
     function obj = set(obj, B)
       
       %   SET -- Set contents.
@@ -138,6 +153,7 @@ classdef WindowDependent
           obj.Value = B.Value;
           obj.Units = B.Units;
         else
+          % @T cast double
           obj.Value = B;
         end
       catch err
@@ -156,6 +172,7 @@ classdef WindowDependent
       value = obj.Value;
     end
     
+    % @T :: [ptb.WindowDependent] = (ptb.WindowDependent, ptb.MaybeWindow)
     function obj = in_px(obj, varargin)
       
       %   IN_PX -- Object with value in pixels.
@@ -169,6 +186,7 @@ classdef WindowDependent
       obj.Units = 'px';
     end
     
+    % @T :: [ptb.WindowDependent] = (ptb.WindowDependent, ptb.MaybeWindow)
     function obj = in_normalized(obj, varargin)
       
       %   IN_NORMALIZED -- Object with value in normalized units.
@@ -183,7 +201,8 @@ classdef WindowDependent
       obj.Units = 'normalized';
     end
     
-    function out = as_px(obj, window)
+    % @T :: [double] = (ptb.WindowDependent, ptb.MaybeWindow)
+    function out = as_px(obj, win)
       
       %   AS_PX -- Get value in pixels.
       %
@@ -220,13 +239,15 @@ classdef WindowDependent
         return
       end
       
-      if ( isempty(window) || ptb.isnull(window) )
+      if ( isempty(win) || ptb.isnull(win) )
         % Other units depend on the dimensions of the Window, so if the
         % window is unspecified, return early.
         out = nan( 1, obj.NDimensions );
         return
       end
       
+      % @T cast ptb.Window
+      window = win;
       w = window.Width;
       h = window.Height;
       
@@ -272,7 +293,8 @@ classdef WindowDependent
       end
     end
     
-    function out = as_normalized(obj, window)
+    % @T :: [double] = (ptb.WindowDependent, ptb.MaybeWindow)
+    function out = as_normalized(obj, win)
       
       %   AS_NORMALIZED -- Get value in normalized units.
       %
@@ -305,11 +327,13 @@ classdef WindowDependent
         return
       end
       
-      if ( isempty(window) || ptb.isnull(window) )
+      if ( isempty(win) || ptb.isnull(win) )
         out = nan( 1, obj.NDimensions );
         return
       end
       
+      % @T cast ptb.Window
+      window = win;
       w = window.Width;
       h = window.Height;
       
@@ -327,6 +351,7 @@ classdef WindowDependent
   end
   
   methods (Access = private)
+    % @T :: [double] = (ptb.WindowDependent, double, double, double)
     function p = get_normalized_value_from_px(obj, value, w, h)
       
       p = value;
@@ -343,6 +368,7 @@ classdef WindowDependent
       end
     end
     
+    % @T :: [double] = (ptb.WindowDependent, double)
     function v = check_value(obj, value)
       N = obj.NDimensions;
       
@@ -359,6 +385,10 @@ classdef WindowDependent
       validateattributes( value, {'numeric'}, attrs, mfilename, 'Value' );
       
       v = double( value(:)' );
+    end
+    
+    % @T :: [] = (ptb.WindowDependent, ptb.Window)
+    function from_window(obj, window)
     end
   end
   
@@ -399,6 +429,7 @@ classdef WindowDependent
       end
     end    
     
+    % @T :: [ptb.WindowDependent] = (double, char)
     function t = OneDimensional(value, units)
       
       if ( nargin < 1 )

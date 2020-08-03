@@ -24,6 +24,7 @@ classdef Mouse < ptb.XYSource
       %     See also GetMouse, Screen, ptb.sources.Eyelink,
       %       ptb.sources.Mouse.update
       
+      % @T cast ptb.sources.Mouse
       obj = obj@ptb.XYSource();
       
       if ( nargin == 0 )
@@ -52,15 +53,17 @@ classdef Mouse < ptb.XYSource
   end
   
   methods (Access = private, Static = true)
-    function window_handle = validate_window_handle(window_handle)
+    function window_handle = validate_window_handle(win)
       
-      if ( isa(window_handle, 'ptb.Window') )
-        if ( ~is_window_handle_valid(window_handle) )
+      if ( isa(win, 'ptb.Window') )
+        if ( ~is_window_handle_valid(win) )
           error( 'The underlying window handle is invalid.' );
         else
-          window_handle = window_handle.WindowHandle;
+          window_handle = win.WindowHandle;
           return
         end
+      else
+        window_handle = win;
       end
       
       validateattributes( window_handle, {'numeric'}, {'scalar', 'integer'} ...

@@ -32,7 +32,9 @@ classdef XYBounds < handle
     %     this method according to their own logic.
     %
     %     See also ptb.XYTarget, ptb.XYBounds
-    test(obj, x, y);
+    %
+    %     @T :: [logical] = (ptb.XYBounds, double, double)
+    tf = test(obj, x, y);
   end
   
 end

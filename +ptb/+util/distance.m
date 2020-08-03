@@ -1,3 +1,5 @@
+% @T import mt.base
+% @T :: [double] = (double, double, double, double)
 function d = distance(x0, y0, x1, y1)
 
 %   DISTANCE -- Distance between two points or sets of points.
