@@ -1,14 +1,17 @@
 classdef ComponentUpdater < handle
   
   properties (Access = private, Constant = true)
-    aggregate_classes = { 'ptb.XYSource', 'ptb.XYSampler', 'ptb.XYTarget' };
-    aggregate_property_names = { 'Sources', 'Samplers', 'Targets' };
+    aggregate_classes = { 'ptb.XYSource', 'ptb.XYSampler' ...
+      , 'ptb.XYTarget', 'ptb.XYMultiSourceTarget' };
+    aggregate_property_names = { 'Sources', 'Samplers' ...
+      , 'Targets', 'MultiSourceTargets' };
   end
   
   properties (GetAccess = public, SetAccess = private)
     Sources = {};
     Samplers = {};
     Targets = {};
+    MultiSourceTargets = {};
   end
   
   methods
@@ -140,6 +143,8 @@ classdef ComponentUpdater < handle
           return
         elseif ( check_remove_component(obj, component, 'Targets') )
           return
+        elseif ( check_remove_component(obj, component, 'MultiSourceTargets') )
+          return
         end
       catch
         % Ignore errors
@@ -175,6 +180,7 @@ classdef ComponentUpdater < handle
       remove_components( obj, obj.Sources{:} );
       remove_components( obj, obj.Samplers{:} );
       remove_components( obj, obj.Targets{:} );
+      remove_components( obj, obj.MultiSourceTargets{:} );
     end
     
     function unique(obj)
@@ -182,6 +188,7 @@ classdef ComponentUpdater < handle
       obj.Sources = unique( obj.Sources );
       obj.Samplers = unique( obj.Samplers );
       obj.Targets = unique( obj.Targets );
+      obj.MultiSourceTargets = unique( obj.MultiSourceTargets );
     end
     
     function update(obj)
@@ -197,6 +204,7 @@ classdef ComponentUpdater < handle
       update_component_set( obj, obj.Sources );
       update_component_set( obj, obj.Samplers );
       update_component_set( obj, obj.Targets );
+      update_component_set( obj, obj.MultiSourceTargets );
     end
     
     function out = create_registered(obj, ctor, varargin)
