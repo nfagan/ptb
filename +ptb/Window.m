@@ -486,7 +486,40 @@ classdef Window < handle
       
       obj.IsOpen = false;
       obj.WindowHandle = nan;
-    end    
+    end   
+    
+    function enable_blending(obj, source_factor, dest_factor)
+      
+      %   ENABLE_BLENDING -- Enable blending in OpenGL.
+      %
+      %     enable_blending( obj ); enables alpha blending for the OpenGL
+      %     context using the default blend factors of GL_SRC_ALPHA for
+      %     source and GL_ONE_MINUS_SRC_ALPHA for the destination.
+      %
+      %     enable_blending( obj, source_factor, dest_factor ); enables
+      %     blending and uses the factors `source_factor` and `dest_factor`
+      %     to control blending.
+      %
+      %     An error is thrown if the underlying Psychtoolbox window is not
+      %     open or is invalid.
+      %
+      %     See also ptb.Window, ptb.Window/open
+      
+      if ( ~is_window_handle_valid(obj) )
+        error( 'Blending can only be changed for a valid Psychtoolbox window.' );
+      end
+      
+      handle = obj.WindowHandle;
+      
+      if ( nargin < 2 )
+        source_factor = GL_SRC_ALPHA;
+      end
+      if ( nargin < 3 )
+        dest_factor = GL_ONE_MINUS_SRC_ALPHA;
+      end
+      
+      Screen( 'BlendFunction', handle, source_factor, dest_factor );
+    end
   end
   
   methods (Access = private)

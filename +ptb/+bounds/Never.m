@@ -10,6 +10,7 @@ classdef Never < ptb.XYBounds
       %
       %     See also ptb.XYBounds, ptb.XYBounds.test, ptb.bounds.Always
       
+      % @T cast ptb.bounds.Never
       obj = obj@ptb.XYBounds();
     end
   end
