@@ -149,7 +149,7 @@ classdef Rect < ptb.XYBounds
         color = [ 255, 255, 255 ];
       end
       
-      rect = get_bounding_rect( obj );
+      rect = get_bounding_rect( obj, window );
       
       try
         Screen( 'FrameRect', window.WindowHandle, color, rect );
@@ -158,7 +158,7 @@ classdef Rect < ptb.XYBounds
       end
     end
     
-    function bounds = get_bounding_rect(obj)
+    function bounds = get_bounding_rect(obj, varargin)
       
       %   GET_BOUNDING_RECT -- Get 4-element bounding rect of the object.
       %
@@ -167,12 +167,17 @@ classdef Rect < ptb.XYBounds
       %     an (x, y) coordinate is in bounds. This rect incorporates the
       %     XOffset, YOffset, and Padding properties.
       %
+      %     bounds = get_bounding_rect( obj, window ) for the ptb.Window
+      %     object `window` passes `window` to the `get_window_dependent`
+      %     method of the underlying BaseRect, which may use `window` to
+      %     compute the bounding rect.
+      %
       %     See also ptb.bounds.XYBounds, ptb.bounds.Rect
       %
       %     OUT:
       %       - `bounds` (double)
       
-      rect = get( obj.BaseRect );
+      rect = get_window_dependent( obj.BaseRect, varargin{:} );
       
       x1 = rect(1) + obj.XOffset + obj.Padding(1);
       x2 = rect(3) + obj.XOffset + obj.Padding(3);

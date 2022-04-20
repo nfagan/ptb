@@ -21,4 +21,10 @@ classdef RectPrimitive
     get(obj);
   end
   
+  methods (Access = public)
+    function r = get_window_dependent(obj, window)
+      r = get( obj );
+    end
+  end
+  
 end

@@ -42,6 +42,20 @@ classdef MatchRectangle < ptb.RectPrimitive
   end
   
   methods (Access = public)
+    function r = get_window_dependent(obj, window)
+      
+      %   GET_WINDOW_DEPENDENT -- Get rect, possibly using the specified
+      %     window.
+      %
+      %     See also ptb.RectPrimitive
+      
+      if ( isa(obj.Rectangle, 'ptb.stimuli.Rect') )
+        r = get_rect( obj.Rectangle, window );
+      else
+        r = get( obj );
+      end
+    end
+    
     function r = get(obj)
       
       %   GET -- Get rect.
