@@ -72,7 +72,8 @@ classdef Rect < ptb.VisualStimulus
       
       try
         if ( isa(edge_color, 'ptb.Color') )
-          Screen( obj.frame_draw_command, window_handle, get(edge_color), rect );
+          Screen( obj.frame_draw_command, window_handle, get(edge_color) ...
+            , rect, obj.EdgePenWidth );
         end
       catch err
         warning( err.message );

@@ -45,6 +45,14 @@ classdef VisualStimulus < handle
     %     See also ptb.VisualStimulus, ptb.Color,
     %       ptb.VisualStimulus.EdgeColor
     EdgeColor = ptb.Null();
+    
+    %   EDGEPENWIDTH -- Border size of the edge of the stimulus.
+    %
+    %     EdgePenWidth is a double scalar that gives the width of the edge
+    %     / frame of the VisualStimulus, if applicable.
+    %
+    %     See also ptb.VisualStimulus/EdgeColor, ptb.VisualStimulus
+    EdgePenWidth = 1;
   end
   
   properties (Access = protected)
@@ -104,6 +112,12 @@ classdef VisualStimulus < handle
     
     function set.EdgeColor(obj, color)
       obj.EdgeColor = check_color( obj, color, obj.EdgeColor );
+    end
+    
+    function set.EdgePenWidth(obj, pw)
+      validateattributes( pw, {'double'}, {'scalar', 'positive', 'finite', 'real'} ...
+        , mfilename, 'EdgePenWidth' );
+      obj.EdgePenWidth = pw;
     end
     
     function set.Window(obj, w)
