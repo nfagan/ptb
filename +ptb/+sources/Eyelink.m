@@ -29,6 +29,19 @@ classdef Eyelink < ptb.XYSource
     Destruct = @(varargin) 1;
   end
   
+  properties (Access = public)
+    
+    %   ENABLEDEBUGMODE -- True to enable debug mode.
+    %
+    %     ENABLEDEBUGMODE is a read-only logical scalar indicating whether
+    %     tracking coordinates, and other debugging information, should be
+    %     printed in real time.
+    %
+    %     See also ptb.sources.Eyelink
+    
+    EnableDebugMode = false;
+  end
+  
   properties (SetAccess = private, GetAccess = public)   
     %   ISINITIALIZED -- True if Eyelink interface is initialized.
     %
@@ -311,6 +324,13 @@ classdef Eyelink < ptb.XYSource
     end
   end
   
+  methods
+    function set.EnableDebugMode(obj, v)
+      validateattributes( v, {'logical'}, {'scalar'}, mfilename, 'EnableDebugMode' );
+      obj.EnableDebugMode = v;
+    end
+  end
+  
   methods (Access = private)    
     function try_open_file(obj, file_name)
       file_name = ptb.sources.Eyelink.validate_scalar_text( file_name, 'filename' );
@@ -405,6 +425,12 @@ classdef Eyelink < ptb.XYSource
       % If either X or Y is missing or NaN, indicate failure
       success = x ~= md && y ~= md && evt.pa(tracked_eye+1) > 0 && ...
         ~isnan( x ) && ~isnan( y );
+      
+      if ( obj.EnableDebugMode )
+        txt = sprintf( 'X: %0.3f, Y: %0.3f, Valid: %d' ...
+          , x, y, double(success) );
+        fprintf( '%s\n', txt );
+      end
     end
   end
   
